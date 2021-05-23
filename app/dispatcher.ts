@@ -28,7 +28,7 @@ interface iError{
 
 const handleRequest= async function(r:any){
 
-	console.log("handling request id: ",r.id)
+	console.log("handling request:",r.id)
 	//@id --> richiesta
 	//@uid --> user id
 	//@rtype --> request type
@@ -45,7 +45,7 @@ const handleRequest= async function(r:any){
 	var times:any={"notific":null,"process":null}
 
 	let userEmails:string [] | null=null;
-	let suppEmail="supporto@roma1.infn.it"
+	let suppEmail="alessandro.ruggieri@roma1.infn.it;"
 		
 	try{
 
@@ -108,6 +108,8 @@ const handleRequest= async function(r:any){
 			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
 		}
 
+		
+
 		//se l'oggetto report non è stato creato (il process.exec ha generato errore)
 		//dobbiamo comunque inviare i dati di report utente e supporto
 		if(!report)
@@ -116,6 +118,7 @@ const handleRequest= async function(r:any){
 		}
 		
 		
+
 		//basic report => user
 		var basicrepo = await report.renderAs(RenderType.BASIC);
 
@@ -182,7 +185,6 @@ const handleRequest= async function(r:any){
 
 		helpers.setDispatchResult(id,times.notific,times.process,err)
 
-		console.log("done request id: ",r.id)
     }
 }
 

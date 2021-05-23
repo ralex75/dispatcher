@@ -19,6 +19,7 @@ function sendMail(from,to,subj,body){
         html:body
     }
 
+    
 
     return new Promise(function(resolve,reject){
         transporter.sendMail(mailOptions, (error, info) => {
