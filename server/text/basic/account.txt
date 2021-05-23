@@ -1,0 +1,51 @@
+<pre>
+=== English version follows ===
+
+Gentile [USER_FULL_NAME],
+questa mail automatica è stata generata a seguito della sua richiesta presso il Servizio di Calcolo di Roma. 
+Di seguito viene riportato un sommario della richiesta effettuata:
+
+Tipo di richiesta: <b>Creazione Account</b>
+
+=============================================
+Nome             = [NAME]
+Cognome          = [SURNAME]
+Telefono         = [PHONE]
+Ruolo            = [ROLE]
+Scadenza         = [EXPIRATION]
+
+Indirizzo email richiesto  = [EMAIL]
+Richiesta recupero dati    = [RESTORE_ITA]
+
+In caso di domande o richieste potete contattare il servizio calcolo all'indirizzo supporto@roma1.infn.it
+
+Cordiali saluti,
+
+    SICR
+
+---------------------------------------------------------------------------------------------------------
+
+=== English version ===
+
+Dear [USER_FULL_NAME],
+this automatic email has been generated upon you request to the IT service in Roma. 
+Here it follows a summary of the request:
+
+Request type: <b>Create Account</b>
+
+=============================================
+Name             = [NAME]
+Surname          = [SURNAME]
+Phone            = [PHONE]
+Role             = [ROLE]
+Expiration       = [EXPIRATION]
+
+Requested email address = [EMAIL]
+Ask for recovery data   = [RESTORE_ENG]
+
+In case of questions of requests you may contact the IT service by sending an email to supporto@roma1.infn.it
+
+Kind regards,
+
+    SICR
+</pre>
