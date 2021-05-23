@@ -7,31 +7,18 @@ class AccountReport extends Report{
         return "account.txt";
     }
 
+
     async mapBasicData(user:any,data:any):Promise<any> {
 
-        let restore_ita:any={"mail":"contenuto della casella di posta elettronica",
-                             "afs":"files AFS",
-                             "mail-afs":"contenuto della casella di posta elettronica e files AFS"}
-
-        let restore_eng:any={"mail":"e-mailbox content",
-                             "afs":"AFS files",
-                             "mail-afs":"e-mailbox content and AFS files"}
-
-        let userEmails:any=[user.email,...user.mailAlternates]
-        userEmails = userEmails[0] ? userEmails.join("; ") : ""
-        
-
-        var map={
-                    "NAME":user.name,
-                    "SURNAME":user.surname,
-                    "EMAIL":data.email,     //email desiderata
-                    "EMAIL_ALT":userEmails, //lista email utente separate da ';'
-                    "PHONE":user.phone || '---',
-                    "EXPIRATION":user.expiration,
-                    "INFNUUID":user.uuid,
-                    "ROLE":user.role,
-                    "RESTORE_ITA":restore_ita[data.restore] || 'Nessuno',
-                    "RESTORE_ENG":restore_eng[data.restore] || 'None'
+         var map={
+                "NAME":user.name,
+                "SURNAME":user.surname,
+                "EMAIL":data.email, //email desiderata
+                "EMAIL_ALT":user.mailAlternates.length>0 ? user.mailAlternates.join(";") : '---',
+                "PHONE":user.phone || '---',
+                "EXPIRATION":user.expiration,
+                "INFNUUID":user.uuid,
+                "ROLE":user.role
                 }
 
         return map;
@@ -42,7 +29,7 @@ class AccountReport extends Report{
 
         var txt:string="";
         var map:any=await this.mapBasicData(user,data);
-        map["UID"]=user.uid || '---';
+        
 
         /*
         txt="=====================  Esito esecuzione automatica  ====================<br>"
