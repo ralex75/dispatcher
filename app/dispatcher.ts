@@ -2,7 +2,8 @@
 import moment from 'moment';
 import {Report,RenderType} from './reports/report'
 import {ReportFactory} from './reports/factory.repo'
-import {ProcessRequest, ProcessResultStatus} from './processors/processor'
+import {ProcessResultStatus} from './processors/process-result'
+import {ProcessFactory} from './processors/factory.proc'
 import {helpers} from './helpers'
 const {getUser} = require('./../api/user')
 
@@ -13,9 +14,15 @@ export const ReadRequests=function(){
 	//console.log("Reading for new requests...")
 
 	helpers.READ_ALL_REQUESTS().then(function(data:any){
-		data.forEach((r:any) => {
-			console.log("rid:",r.id);
-			handleRequest(r);
+		let i=1;
+		data.forEach((r:any,index:number) => {
+			//console.log("rid:",r.id);
+			console.log(index);
+			
+			setTimeout(()=>{
+				//console.log("Handling request:",r.id)
+				handleRequest(r)
+			},5000*index);
 		})
 	})
 
@@ -36,8 +43,7 @@ const handleRequest= async function(r:any){
 	
 	//dati della richiesta
 	var {id, uid, rtype, data} = r;
-	//var error:{"type":string,"value":string}|null=null;
-	//var error:iError|null=null;
+	
 	let report:Report | null=null;
 	var errors:iError[]=[];
 
@@ -60,13 +66,12 @@ const handleRequest= async function(r:any){
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
 		
-		if(!userEmails[0]) throw new Error("User email address not found.")
-
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
 		let userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
 
 		userMailAddr=userMailAddr || user.email;
+
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
@@ -85,12 +90,13 @@ const handleRequest= async function(r:any){
 		try
 		{
 			//inizializza il processatore di richiesta
-			processor=ProcessRequest.initialize(rtype,user,data);
+			processor=ProcessFactory.initialize(r,user,data);
 
 			console.log(`Processing Request ID: ${id} - ${rtype}`)
 			
 			//gestione automatica della richiesta (se implementato)
 			//ritorna oggetto di tipo report (wifi,account o IP)
+			//helpers.setDispatchResult(id,times.notific,times.process,null,"PROCESSING");
 			report=await processor.exec();
 
 			console.log(`Processed Request ID: ${id} - ${rtype}`)
@@ -140,19 +146,18 @@ const handleRequest= async function(r:any){
 
 		//Invia Report all'utente
 		console.log("sending basic report to user address: ",userMailAddr)
-		await helpers.sendReport(suppEmail,userMailAddr,mailSubj,basicrepo);
+		//helpers.sendReport(suppEmail,userMailAddr,mailSubj,basicrepo);
 
 		//Invia Report al servizio 
 		console.log("sending adv report to supporto: ",suppEmail)
-		await helpers.sendReport(userMailAddr,suppEmail, mailSubj+" -- Riservata Supporto --",advrepo);
+		helpers.sendReport(userMailAddr,suppEmail, mailSubj+" -- Riservata Supporto --",advrepo);
 
 		times.notific=moment();
 		
-		console.log("Done.")
+
 	}
 	catch(exc)
     {
-		console.log(exc);
 		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
     }
     finally
@@ -161,7 +166,7 @@ const handleRequest= async function(r:any){
 		times.process=moment()
 		let err=errors.length>0 ? JSON.stringify(errors) : null;
 
-		errors.forEach(async err=>
+		errors.forEach(err=>
 		{
 			
 			let errTxt=JSON.stringify(err);
@@ -173,17 +178,12 @@ const handleRequest= async function(r:any){
 			}*/
 
 			//let to=user ? user.email : "alessandro.ruggieri@roma1.infn.it";//"supporto@®roma1.infn.it"
-			try{
-				await helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
-			}
-			catch(exc){
-				console.log(exc);
-			}
+			//helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
 	
 		})
 		
 
-		helpers.setDispatchResult(id,times.notific,times.process,err)
+		//helpers.setDispatchResult(id,times.notific,times.process,err)
 
     }
 }
