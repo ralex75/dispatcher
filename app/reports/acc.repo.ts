@@ -46,22 +46,24 @@ class AccountReport extends Report{
         var map:any=await this.mapBasicData(user,data);
 
         if(data.restore && data.restore=='mail'){
+            console.log("Entrato")
             let bckmailuser=`${user.uid}-mailbox.tgz`
             let restore_mail_procedure=`
-                                        <pre>
-                                        ======= Procedura di ripristino mail ================<br>
-                                        - collegarsi su freezer2<br>
-                                        - <b>cd /data/vm+servizi/bckuser/${user.uid}</b><br>
-                                        - <b>scp ${bckmailuser}  root@mailbox:. </b><br>
-                                        - collegarsi su mailbox<br>
-                                        - <b>cd /var/imap</b><br>
-                                        - <b>tar xzvf /root/${bckmailuser}</b> 
-                                        - <b>cd</b><br>
-                                        - <b>rm ${bckmailuser}</b><br>
-                                        =====================================================<br>
-                                        </pre>
+            
+                                        ======= Procedura di ripristino mail ================|
+                                        - collegarsi su freezer2|
+                                        - <b>cd /data/vm+servizi/bckuser/${user.uid}</b>|
+                                        - <b>scp ${bckmailuser}  root@mailbox:. </b>|
+                                        - collegarsi su mailbox|
+                                        - <b>cd /var/imap</b>|
+                                        - <b>tar xzvf /root/${bckmailuser}</b>| 
+                                        - <b>cd</b>|
+                                        - <b>rm ${bckmailuser}</b>|
+                                        =====================================================|
+                                        
                                         `
-            map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure
+            map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure.split("|").map(e=>e.trim()).join("<br>")
+            
         }
         //map["UID"]=user.uid || '---';
 

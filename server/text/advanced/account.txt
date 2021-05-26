@@ -16,4 +16,4 @@ Indirizzo email richiesto = [EMAIL]
 Recupero  dati  richiesto = [RESTORE_ITA]
 </pre>
 
-[RESTORE_MAIL]
+[RESTORE_MAIL_PROCEDURE]
