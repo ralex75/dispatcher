@@ -4,7 +4,6 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "@types/node": "^14.0.23",
     "axios": "^0.21.1",
     "ldapjs": "^2.2.0",
     "moment": "^2.27.0",
@@ -16,6 +15,7 @@
     "webpack-node-externals": "^2.5.1"
   },
   "devDependencies": {
+    "@types/node": "^14.17.1",
     "webpack-cli": "^3.3.12"
   },
   "scripts": {
