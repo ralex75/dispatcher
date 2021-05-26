@@ -13,6 +13,7 @@ Scadenza         = [EXPIRATION]
 
 =============================================
 Indirizzo email richiesto = [EMAIL]
-Richiesta recupero dati   = [RESTORE_ITA]
+Recupero  dati  richiesto = [RESTORE_ITA]
 </pre>
 
+[RESTORE_MAIL]

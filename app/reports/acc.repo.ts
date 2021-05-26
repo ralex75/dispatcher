@@ -22,6 +22,7 @@ class AccountReport extends Report{
         
 
         var map={
+                    "UID":user.uid || '---',
                     "NAME":user.name,
                     "SURNAME":user.surname,
                     "EMAIL":data.email,     //email desiderata
@@ -31,7 +32,8 @@ class AccountReport extends Report{
                     "INFNUUID":user.uuid,
                     "ROLE":user.role,
                     "RESTORE_ITA":restore_ita[data.restore] || 'Nessuno',
-                    "RESTORE_ENG":restore_eng[data.restore] || 'None'
+                    "RESTORE_ENG":restore_eng[data.restore] || 'None',
+                    "RESTORE_MAIL_PROCEDURE":""
                 }
 
         return map;
@@ -42,7 +44,26 @@ class AccountReport extends Report{
 
         var txt:string="";
         var map:any=await this.mapBasicData(user,data);
-        map["UID"]=user.uid || '---';
+
+        if(data.restore && data.restore=='mail'){
+            let bckmailuser=`${user.uid}-mailbox.tgz`
+            let restore_mail_procedure=`
+                                        <pre>
+                                        ======= Procedura di ripristino mail ================<br>
+                                        - collegarsi su freezer2<br>
+                                        - <b>cd /data/vm+servizi/bckuser/${user.uid}</b><br>
+                                        - <b>scp ${bckmailuser}  root@mailbox:. </b><br>
+                                        - collegarsi su mailbox<br>
+                                        - <b>cd /var/imap</b><br>
+                                        - <b>tar xzvf /root/${bckmailuser}</b> 
+                                        - <b>cd</b><br>
+                                        - <b>rm ${bckmailuser}</b><br>
+                                        =====================================================<br>
+                                        </pre>
+                                        `
+            map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure
+        }
+        //map["UID"]=user.uid || '---';
 
         /*
         txt="=====================  Esito esecuzione automatica  ====================<br>"

@@ -15,7 +15,7 @@ Ruolo            = [ROLE]
 Scadenza         = [EXPIRATION]
 
 Indirizzo email richiesto  = [EMAIL]
-Richiesta recupero dati    = [RESTORE_ITA]
+Recupero  dati  richiesto  = [RESTORE_ITA]
 
 In caso di domande o richieste potete contattare il servizio calcolo all'indirizzo supporto@roma1.infn.it
 
@@ -41,7 +41,7 @@ Role             = [ROLE]
 Expiration       = [EXPIRATION]
 
 Requested email address = [EMAIL]
-Ask for recovery data   = [RESTORE_ENG]
+Data recovery required  = [RESTORE_ENG]
 
 In case of questions of requests you may contact the IT service by sending an email to supporto@roma1.infn.it
 
