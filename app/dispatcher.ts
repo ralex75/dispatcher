@@ -28,7 +28,7 @@ interface iError{
 
 const handleRequest= async function(r:any){
 
-	console.log("handling request:",r.id)
+	console.log("handling request id: ",r.id)
 	//@id --> richiesta
 	//@uid --> user id
 	//@rtype --> request type
@@ -45,7 +45,7 @@ const handleRequest= async function(r:any){
 	var times:any={"notific":null,"process":null}
 
 	let userEmails:string [] | null=null;
-	let suppEmail="alessandro.ruggieri@roma1.infn.it;"
+	let suppEmail="supporto@roma1.infn.it"
 		
 	try{
 
@@ -60,13 +60,12 @@ const handleRequest= async function(r:any){
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
 		
-		if(!userEmails[0]) throw new Error("User email address not found.")
-
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
 		let userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
 
 		userMailAddr=userMailAddr || user.email;
+
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
@@ -108,8 +107,6 @@ const handleRequest= async function(r:any){
 			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
 		}
 
-		
-
 		//se l'oggetto report non è stato creato (il process.exec ha generato errore)
 		//dobbiamo comunque inviare i dati di report utente e supporto
 		if(!report)
@@ -118,7 +115,6 @@ const handleRequest= async function(r:any){
 		}
 		
 		
-
 		//basic report => user
 		var basicrepo = await report.renderAs(RenderType.BASIC);
 
@@ -140,19 +136,18 @@ const handleRequest= async function(r:any){
 
 		//Invia Report all'utente
 		console.log("sending basic report to user address: ",userMailAddr)
-		await helpers.sendReport(suppEmail,userMailAddr,mailSubj,basicrepo);
+		helpers.sendReport(suppEmail,userMailAddr,mailSubj,basicrepo);
 
 		//Invia Report al servizio 
 		console.log("sending adv report to supporto: ",suppEmail)
-		await helpers.sendReport(userMailAddr,suppEmail, mailSubj+" -- Riservata Supporto --",advrepo);
+		helpers.sendReport(userMailAddr,suppEmail, mailSubj+" -- Riservata Supporto --",advrepo);
 
 		times.notific=moment();
 		
-		console.log("Done.")
+
 	}
 	catch(exc)
     {
-		console.log(exc);
 		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
     }
     finally
@@ -161,7 +156,7 @@ const handleRequest= async function(r:any){
 		times.process=moment()
 		let err=errors.length>0 ? JSON.stringify(errors) : null;
 
-		errors.forEach(async err=>
+		errors.forEach(err=>
 		{
 			
 			let errTxt=JSON.stringify(err);
@@ -173,18 +168,14 @@ const handleRequest= async function(r:any){
 			}*/
 
 			//let to=user ? user.email : "alessandro.ruggieri@roma1.infn.it";//"supporto@®roma1.infn.it"
-			try{
-				await helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
-			}
-			catch(exc){
-				console.log(exc);
-			}
+			helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
 	
 		})
 		
 
 		helpers.setDispatchResult(id,times.notific,times.process,err)
 
+		console.log("done request id: ",r.id)
     }
 }
 
