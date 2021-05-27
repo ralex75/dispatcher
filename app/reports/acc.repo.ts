@@ -42,15 +42,18 @@ class AccountReport extends Report{
 
     async mapAdvancedData(user:any,data:any):Promise<any> {
 
-        var txt:string="";
+       
         var map:any=await this.mapBasicData(user,data);
 
         if(data.restore && data.restore=='mail'){
-            console.log("Entrato")
+           
             let bckmailuser=`${user.uid}-mailbox.tgz`
             let restore_mail_procedure=`
             
-                                        ======= Procedura di ripristino mail ================|
+                                        ======= Procedura di ripristino mail ================||
+
+                                        <u>ATTENZIONE!!! - Eseguire questi passi solo DOPO aver creato l'account e prima di inviare la mail di test.</u>||
+
                                         - collegarsi su freezer2|
                                         - <b>cd /data/vm+servizi/bckuser/${user.uid}</b>|
                                         - <b>scp ${bckmailuser}  root@mailbox:. </b>|
@@ -65,22 +68,6 @@ class AccountReport extends Report{
             map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure.split("|").map(e=>e.trim()).join("<br>")
             
         }
-        //map["UID"]=user.uid || '---';
-
-        /*
-        txt="=====================  Esito esecuzione automatica  ====================<br>"
-
-        //var procResultData:string=map["processResult"] || null;
-        console.log("pr:",this.processResult);
-        if (this.processResult && this.processResult.status=='OK')
-        {
-            txt+= JSON.stringify(this.processResult.value);
-        }
-        else{
-            txt="NON GESTITA"
-        }
-
-        map["[ADDITIONAL_DATA]"]=txt;*/
        
         return map;
 
