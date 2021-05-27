@@ -173,7 +173,7 @@ const handleRequest= async function(r:any){
 		})
 		
 
-		//helpers.setDispatchResult(id,times.notific,times.process,err)
+		helpers.setDispatchResult(id,times.notific,times.process,err)
 
 		console.log("done request id: ",r.id)
     }
