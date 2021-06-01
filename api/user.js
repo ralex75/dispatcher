@@ -99,6 +99,10 @@ var parseLDAPUserInfo=function (user) {
 
        _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
         
+        /*if(e.indexOf("i:infn:roma1:servizio_calcolo_e_reti")>-1)
+        {
+            isAdmin=true;
+        }*/
 
         _isMemberOf.forEach(e=>{
             let match=e.match(/i:infn:roma1::([d|o|a|v])\:(\w+)/);
@@ -119,20 +123,6 @@ var parseLDAPUserInfo=function (user) {
     }
     
 
-<<<<<<< HEAD
-=======
-    //controllo se autorizzato
-    const {loa2, itsec, policies, gracetime} = cuser;
-    
-    let isAuthorized = role && loa2 && policies;
-
-    if(isAuthorized && !itsec)
-    {
-        isAuthorized=gracetime;
-    }
-    
-
->>>>>>> master
     cuser["isAuthorized"]=isAuthorized
     cuser["role"]=role;
     //cuser["isAdmin"]=isAdmin;
