@@ -119,6 +119,20 @@ var parseLDAPUserInfo=function (user) {
     }
     
 
+<<<<<<< HEAD
+=======
+    //controllo se autorizzato
+    const {loa2, itsec, policies, gracetime} = cuser;
+    
+    let isAuthorized = role && loa2 && policies;
+
+    if(isAuthorized && !itsec)
+    {
+        isAuthorized=gracetime;
+    }
+    
+
+>>>>>>> master
     cuser["isAuthorized"]=isAuthorized
     cuser["role"]=role;
     //cuser["isAdmin"]=isAdmin;
