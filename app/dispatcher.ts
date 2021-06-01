@@ -73,7 +73,7 @@ const handleRequest= async function(r:any){
 
 		if(!isValid)
 		{
-			throw new Error("User in not authorized!:"+JSON.stringify(user))
+			throw new Error("User is not authorized!:"+JSON.stringify(user))
 		}
 
 		
