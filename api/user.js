@@ -94,12 +94,10 @@ var parseLDAPUserInfo=function (user) {
        
     }
 
-    
+    //recupera ruolo
     if(isMemberOf){
 
-       
-        //controllo se autorizzato
-        _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
+       _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
         
 
         _isMemberOf.forEach(e=>{
@@ -107,9 +105,21 @@ var parseLDAPUserInfo=function (user) {
             if(match) {role = match[2]}
         })
 
+
     }
 
-    cuser["isAuthorized"]=role!=""
+    //controllo se autorizzato
+    const {loa2, itsec, policies, gracetime} = cuser;
+    
+    let isAuthorized = role && loa2 && policies;
+
+    if(isAuthorized && !itsec)
+    {
+        isAuthorized=gracetime;
+    }
+    
+
+    cuser["isAuthorized"]=isAuthorized
     cuser["role"]=role;
     //cuser["isAdmin"]=isAdmin;
 
