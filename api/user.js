@@ -94,11 +94,11 @@ var parseLDAPUserInfo=function (user) {
        
     }
 
-    
+    //cerca ruolo
     if(isMemberOf){
 
        
-        //controllo se autorizzato
+        
         _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
         
 
