@@ -69,7 +69,7 @@ const handleRequest= async function(r:any){
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
-		let isValid = user.isAuthorized && user.policies;
+		let isValid = user.isAuthorized;
 
 		if(!isValid)
 		{
