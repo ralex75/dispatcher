@@ -1,0 +1,548 @@
+import {IPReport} from '../reports/ip.repo'
+import {ProcessRequest} from './processor'
+import {iProcessResult,ProcessResultOK,ProcessResultBAD} from './process-result'
+import {network,iSwitchPort, helpers} from '../helpers'
+import { exception } from 'console'
+
+
+class IP_Processor extends ProcessRequest 
+{
+    private errDesc:any={"LINKED_HOSTS":"Ci sono nodi statici sulla porta",
+                                   "NO_PORT_LINK":"Porta non collegata"}
+    
+    private errKeys:any={"linkedHosts":"LINKED_HOSTS","noPortLink":"NO_PORT_LINK"};
+
+    constructor(user:any,data:any)
+    {
+        super(user,data)
+       
+    }
+
+    isValidData(data:any)
+    {
+        
+        //Check data
+        return true;
+    }
+
+    async exec(){
+
+        console.log("Exec processor IP")
+
+        let user=this.user;
+        let data=this.data;
+        let {from,to,action}=data;
+        
+        
+        let results:any={
+
+            "host_handle"   :{"success":false,"exc":""},
+            "toSwp_handle"  :{"success":false,"exc":""},
+            "fromSwp_handle":{"success":false,"exc":""}
+        }
+
+        //let canProceed:boolean=false;
+        let processResult:iProcessResult|null=null;
+
+        try{
+
+            if(to.config=='DHCP')
+            {
+                if(action=='create')
+                {
+                    await this.handleNodeCreation(results,data,user)
+                }
+                else if(action=='update')
+                {
+                    await this.handleNodeUpdate(results,data,user)
+                }
+            }
+
+        }
+        catch(exc)
+        {
+            console.log("Gestione richiesta IP fallita:",exc)
+        }
+            
+        let failed=Object.keys(results).filter(k=>results[k].success).length==0
+        processResult= failed ? new ProcessResultBAD(results): new ProcessResultOK(results);
+        
+        console.log("results:",results)
+ 
+        if(failed)
+        {
+            console.log("Failed Process:",results)
+        }
+
+        return new IPReport(user,data,processResult);
+    }
+
+    getErrorDesc(msg:string){
+        return this.errDesc[msg] || msg;
+    }
+
+     //----------------------------------------------------
+    // GESTIONE CREAZIONE NUOVO NODO
+    //----------------------------------------------------
+    async handleNodeUpdate(results:any,data:any,user:any){
+        
+        let {from,to}=data;
+
+        try{
+
+           
+            let toSwp:any = await network.getSwitchPortByPortCode(to.port);
+
+            try{
+
+                let {sw_name, sw_port_no, sw_port_vlanid}=toSwp
+                
+                //query by snmp switchport destination
+                process.stdout.write(`\nquerying switchport ${sw_name}#${sw_port_no} by snmp...`)
+                let swpi=await this.getSwitchPortInfoBySNMP(sw_name,sw_port_no);
+                console.log("swpi:",swpi)
+                process.stdout.write("done.\n")
+
+                if(!swpi.enabled || swpi.vlanid!=113)
+                {
+                    //recupera i mac dei nodi connessi alla porta
+                    let toLinkedHosts:any=await network.getPortLinkedHosts(to.port);
+                    
+                    //filtra i nodi connessi alla porta di destinazione escluso il proprio
+                    toLinkedHosts= toLinkedHosts.filter((h:any)=> h.host_mac && h.host_mac.toLowerCase()!=from.mac.toLowerCase()).length;
+                    if(toLinkedHosts.length>0)
+                    {
+                        throw Error(this.errKeys.linkedHosts)
+                    }
+
+                    //imposta porta a DHCP
+                    toSwp.sw_port_enabled  = true;
+                    toSwp.sw_port_security = false;
+                    toSwp.sw_port_vlanid = 113
+
+                    await this.saveSwitchPort(toSwp)
+                }
+
+                results.toSwp_handle.success=true;
+            }
+            catch(exc)
+            {
+                process.stdout.write("failed.\n")
+                results.toSwp_handle.exc=this.getErrorDesc(exc.message || exc);
+            }
+
+
+            try{
+                if(!results.toSwp_handle)
+                {
+                    throw Error("Gestione porta switch sorgente o destinazione fallita. Aggiornamento dati del nodo annullato.")
+                }
+                await this.saveHost(from,to,user)
+                results.host_handle.success=true;
+            }
+            catch(exc)
+            {
+                results.host_handle.exc=exc.message || exc; 
+            }
+
+
+            //GESTIONE PORTA SWITCH SORGENTE
+            try{
+               
+                if(from.port!=to.port)
+                {
+                    let fromSwp:any=await network.getSwitchPortByPortCode(from.port)
+
+                    if(fromSwp && fromSwp.sw_port_vlanid!=113)
+                    {
+                        let linkedHosts:any=await network.getPortLinkedHosts(from.port);
+                        fromSwp.sw_port_enabled=linkedHosts.length>0;
+                        console.log("linked fromSWP:",linkedHosts)
+                        await this.saveSwitchPort(fromSwp)
+                    }
+
+                }
+                
+                results.fromSwp_handle.success=true;
+            }
+            catch(exc)
+            {
+                process.stdout.write("failed.\n")
+                results.fromSwp_handle.exc=exc.message || exc;
+            }
+
+        }
+        catch(exc)
+        {
+            throw exc;
+        }
+
+    }
+
+    
+
+    //----------------------------------------------------
+    // GESTIONE CREAZIONE NUOVO NODO
+    //----------------------------------------------------
+    async handleNodeCreation(results:any,data:any,user:any){
+        
+        let {from,to}=data;
+
+        results.fromSwp_handle.success=true;
+
+        try{
+            
+            //recupera info porta switch di destinazione
+            let toSwp:any = await network.getSwitchPortByPortCode(to.port);
+
+            //manca la porta switch di collegamento alla porta pp
+            if(!toSwp)
+            {
+                throw Error(this.errKeys.noPortLink)
+            }
+
+            //recupera i mac dei nodi connessi alla porta
+            let toLinkedHosts:any=await network.getPortLinkedHosts(to.port);
+
+            //console.log("Nodi collegati alla porta:",toLinkedHosts);
+            let {sw_name,sw_port_no}=toSwp;
+
+            process.stdout.write(`\nquerying switchport ${sw_name}#${sw_port_no} by snmp...`)
+            let swpi=await this.getSwitchPortInfoBySNMP(sw_name,sw_port_no);
+            
+            //abilitare questo controllo se vogliamo evitare che una porta non DHCP con NODI diventi DHCP
+            if(swpi.vlanid!=113)
+            {
+                
+                if(toLinkedHosts.length>0)
+                {
+                    throw Error(this.errKeys.linkedHosts)
+                }
+
+            }
+            
+            //imposta porta a DHCP
+            toSwp.sw_port_enabled  = true;
+            toSwp.sw_port_security = false;
+            toSwp.sw_port_vlanid = 113
+
+            await this.saveSwitchPort(toSwp)
+
+            results.toSwp_handle.success=true;
+
+        }
+        catch(exc)
+        {
+            process.stdout.write("failed.\n")
+            results.toSwp_handle.exc=exc.message || exc;
+        }
+      
+
+        try{
+            
+            let proceed=true;
+
+            if(results.toSwp_handle.exc)
+            {
+
+            }
+            
+            if(proceed)
+            {
+                await this.saveHost(from,to,user)
+                results.host_handle.success=true;
+            }
+
+        }
+        catch(exc)
+        {
+            process.stdout.write("failed.\n")
+            results.host_handle.exc=exc.message || exc; 
+        }
+
+    }
+
+    async getSwitchPortInfoBySNMP(sw_name:any,sw_port_no:any)
+    {
+        let {data:swpi}=await network.getSwPortInfoBySNMP(sw_name,sw_port_no);
+        return swpi;
+    }
+
+    //Salva e sincronizza un nodo
+    async saveHost(from:any,to:any,user:any){
+
+       
+     
+        process.stdout.write(`\nInserimento informazioni del nuovo nodo ${to.mac}...`)                     
+        await network.saveHost(from?.mac,to.mac,to.port,user);
+        process.stdout.write("done.")
+
+        //sync dhcp
+        process.stdout.write(`\nsincronizzazione nodi DHCP...`)  
+        //let res=await network.syncDHCPHosts();
+        let res={"status":200,"data":"sync success"}
+        process.stdout.write("done.")
+        
+        //results.host_handle.success=(res.status==200 && res.data.toLowerCase()=="sync success");
+        if(res.data.toLowerCase()!="sync success")
+        {
+            throw Error("Sincronizzazione DHCP fallita")
+        }
+       
+
+    }
+
+     //Salva e sincronizza un nodo
+    async saveSwitchPort(swp:any){
+
+        let {sw_name,sw_port_no,sw_port_vlanid,sw_port_enabled,sw_port_security}=swp;
+     
+        //salva la porta 
+        process.stdout.write(`\nsaving switch port ${sw_name}#${sw_port_no} to DHCP ...`)
+        await network.saveSwitchPort(swp);
+        process.stdout.write("done.\n")
+        let swpi=await this.getSwitchPortInfoBySNMP(sw_name,sw_port_no)
+       
+        //sincronizza la porta se non è DHCP o non è abilitata
+        if(swpi.vlanid!=sw_port_vlanid || swpi.enabled!=sw_port_enabled 
+            || swpi.security!=sw_port_security || swpi.vlanid!=113)
+        {
+            process.stdout.write(`\nsync switch port ${sw_name}#${sw_port_no} by snmp...`)
+            await network.syncSwitchPort(sw_name,sw_port_no);
+            process.stdout.write("done.\n")
+
+        }
+
+    }
+
+    async execOld()
+    {
+        console.log("Exec processor IP")
+
+        let user=this.user;
+        let data=this.data;
+        let {from,to,action}=data;
+        
+        let results:any=null;
+        let processResult:iProcessResult|null=null;
+    
+
+        /*if(action=='update')
+        {
+            let diff=Object.keys(from).filter(k=>from[k]!=to[k])
+            if(diff.length==1 && diff.indexOf("mac")>-1)
+            {
+
+            }
+        }*/
+
+        //LOGIC HERE
+      
+        //GESTIONE aggiornamento NODO
+        if((action=='update' || action=='create') && to.config=='DHCP')
+        {
+                
+                //recupera info porta switch di destinazione
+                let toSwp:any = await network.getSwitchPortByPortCode(to.port);
+               
+                console.log("Exec processor IP - QUI swplink")
+
+                //recupera i mac dei nodi connessi alla porta
+                let toLinkedHosts:any=await network.getPortLinkedHosts(to.port);
+        
+                console.log("Exec processor IP - QUI linkedHost")
+
+                console.log("toLinkedHosts:",toLinkedHosts);
+
+                //filtra i nodi connessi alla porta di destinazione escluso il proprio
+                toLinkedHosts= toLinkedHosts.filter((h:any)=> h.host_mac && h.host_mac.toLowerCase()!=to.mac.toLowerCase()).length;
+
+                console.log("toLinkedHosts dopo filtro mac:",toLinkedHosts)
+               
+                //si può procedere solo se la porta di destinazione è collegata ad una porta switch 
+                //e la vlan della porta è 113 o è <> 113 ma ha 0 nodi collegati
+                let proceed=(toSwp && (toSwp.sw_port_vlanid==113 || toLinkedHosts==0))
+            
+                console.log("sw_name:",toSwp)
+                console.log("Can proceed:",proceed)
+
+
+                if(proceed)
+                {
+ 
+                    console.log("Processing...")
+
+                    results={
+
+                                "host_save":{"success":false,"exc":""},
+                                "host_sync":{"success":false,"exc":""},
+                                "toSwp_sync" :{"success":false,"exc":""},
+                                "fromSwp_sync":{"success":false,"exc":""}
+
+                            }
+
+                    try{
+
+                        
+                        //save host
+                        console.log("salvataggio NODO")
+
+                        //console.log("pass")
+                        await network.saveHost(from?.mac,to.mac,to.port,user);
+                        results.host_save.success=true;
+
+                        //se si tratta di uno spostamento,
+                        //se la porta sorgente era statica rimuove sicurezza e sincronizza
+                        console.log("======================================")
+                        console.log("= inizio gestione porta sorgente =====")
+                        console.log("======================================")
+
+                        if (from && from.port!=to.port)
+                        {
+                            try{
+                                //recupera informazioni sul collegamento della porta sorgente
+                                let fromSwp:any=await network.getSwitchPortByPortCode(from.port);
+
+                                if(fromSwp && fromSwp.sw_port_vlanid!=113)
+                                {
+                                                                                                               
+                                        //nodi collegati alla porta
+                                        let fromLinkedHost:any=await network.getPortLinkedHosts(from.port);
+                                        
+                                        console.log("fromLinkedHost:",fromLinkedHost)
+
+                                        //setta sicurezza solo se ci sono nodi
+                                        fromSwp.sw_port_security=fromLinkedHost.length>0;
+
+                                        //salva la porta 
+                                        console.log("salvataggio porta switch sorgente")
+                                        await network.saveSwitchPort(fromSwp);
+
+                                        //sincronizza
+                                        console.log("sincronizzazione porta switch sorgente")
+                                        await network.syncSwitchPort(fromSwp.sw_name,fromSwp.sw_port_no);
+                                        console.log("sincronizzazione porta switch sorgente -fatto")
+                                       
+                                        
+                                        results["fromSwp_sync"].success=true;
+                                }
+                                    
+                                        
+                            }
+                            catch(exc)
+                            {
+                                results["fromSwp_sync"].exc=exc;
+                            }
+                        }
+
+                        console.log("======================================")
+                        console.log("= fine gestione porta sorgente =====")
+                        console.log("======================================")
+
+                        try{
+                            
+                            console.log("sincronizzazione nodi DHCP")
+                            //sync dhcp
+                            //let res=await network.syncDHCPHosts();
+                            let res={"status":200,"data":"sync success"}
+                        
+                            console.log("sincronizzazione nodi DHCP - FATTO");
+                            results.host_sync.success=(res.status==200 && res.data.toLowerCase()=="sync success");
+                        }
+                        catch(exc)
+                        {   
+                            console.log("Exc in Node Save")
+                            results.host_sync.exc=exc;
+                        }
+
+                        //toSwp
+                        try{
+
+                            let {sw_name,sw_port_no}=toSwp
+
+                            console.log(`querying switch port ${sw_name}#${sw_port_no} by snmp...`)
+                            let swpi=await network.getSwPortInfoBySNMP(sw_name,sw_port_no);
+                            
+                            let {vlanid,enabled}=swpi.data;
+
+                            if(vlanid!=113 || !enabled)
+                            {
+
+                                toSwp.sw_port_enabled  = true;
+                                toSwp.sw_port_security = false;
+                                toSwp.vlanid = 113
+
+                                //salva la porta 
+                                console.log(`saving switch port ${sw_name}#${sw_port_no} by snmp...`)
+                                await network.saveSwitchPort(toSwp);
+
+                                console.log(`sync switch port ${sw_name}#${sw_port_no} by snmp...`)
+                                await network.syncSwitchPort(sw_name,sw_port_no);
+
+                                console.log(`querying switch port ${sw_name}#${sw_port_no} by snmp...`)
+                                swpi=await network.getSwPortInfoBySNMP(sw_name,sw_port_no);
+
+
+                            }
+
+                            //let swpi=await network.getSwPortInfoBySNMP(sw_name,sw_port_no);
+                            //let {vlanid,enabled}=swpi.data;
+                            results.swp_sync.success=vlanid==113 && enabled;
+                            
+                        }
+                        catch(exc)
+                        {
+                            results.swp_sync.exc=exc;
+                        }
+
+                      
+                    }
+                    catch(exc)
+                    {
+                        //results.host_save.exc=exc;
+                        //console.log("results:",results)
+                        console.log(exc)
+                        processResult=new ProcessResultBAD(results);
+                    }
+
+                }
+
+        }
+
+        //GESTIONE ELIMINAZIONE NODO
+        if(action=='delete')
+        {
+            results={
+                "host_del":{"success":false,exc:""},
+            }
+
+            try{
+
+                await network.deleteHost(from.mac);
+                results.success=true;
+
+            }
+            catch(exc)
+            {
+                results.exc=exc;
+                processResult=new ProcessResultBAD(results);
+                console.log(exc)
+            }
+        }
+
+        if(!processResult)
+        {
+            processResult=new ProcessResultOK(results);
+        }
+
+
+        console.log("results:",results)
+
+
+        return new IPReport(user,data,processResult);
+       
+    }
+  
+}
+
+export {IP_Processor}

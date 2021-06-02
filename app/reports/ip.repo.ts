@@ -1,6 +1,7 @@
 import {Report} from './report'
 import {helpers} from '../helpers'
-import { formatWithOptions } from 'util';
+import {DeleteMachineStatus,UpdateMachineStatus} from '../machines/machineTypes'
+import {ProcessResultStatus} from '../processors/process-result'
 
 
 class IPReport extends Report{
@@ -90,7 +91,6 @@ class IPReport extends Report{
 
     async mapAdvancedData(user:any,data:any):Promise<any>{
 
-        var txt:string="";
         var {from,to,action} = data;
         var h= to || from;
         var map:any=await this.mapBasicData(user,data);
@@ -103,29 +103,61 @@ class IPReport extends Report{
             map["USE_MAC_BUSY"]=`Attenzione, l'utente ha confermato l'intenzione di voler gestire il nodo con mac address ${to["mac"].toUpperCase()} che risulta già registrato.`
         }
 
-        /*
-        if(h.config!="DHCP")
-        {
-            var net:any=await helpers.getPortNetwork(h.port);
-            network = net ? net.network: "N/A";
-         }
-        else{
-            network = "141.108.13.0/24";
-        }
-        */
-
-        /* NON INSERIRE ---> MOSTRARE LE VLAN SUGGERITE DEL PIANO TODO
-        txt="=====================  dati aggiuntivi  ====================<br>"
-        txt+=helpers.addEmptySpacesToEnd(18,"Network suggerita")+ " = "+ network;
-        */
-        
+        let report=""     
+        let txt:string="=====================  Esito esecuzione automatica  ====================<br>"
+       
 
         if (this.processResult)
         {
-            txt+="=====================  Esito esecuzione automatica  ====================<br>"
-            txt+= JSON.stringify(this.processResult.getValue());
+            let result=this.processResult.getStatus();
+            
+            if(result==ProcessResultStatus.OK)
+            {
+                let logs=this.processResult.getValue();
+                
+                if(logs['ERROR'].done)
+                {
+                    report="<b>Incompleta</b> - terminata con errori"
+                }
+
+                let {ERROR,END,EXIT,...rest}=logs
+
+                txt+=report+"<br>"
+                Object.keys(rest).forEach(k => {
+                     let state=rest[k]
+                     let desc= state.description ? state.description : k;
+                     
+                     txt+=`<br>${desc}: <b>${state.done ? "completato":"non completato"}</b>`
+                     /*if(state.data)
+                     {
+                         txt+=":"+JSON.stringify(state.data)
+                     }*/
+                     if(!state.done){
+                         txt+=`<br>--(${state.exc})--`;
+                     }
+                   
+                });
+
+                console.log(from)
+
+                if(from && from.config!='DHCP')
+                {
+                    console.log(rest)
+                    let state= rest["HOST_DELETE"] || rest["HOST_SAVE"]
+                    console.log("STATE:",state)
+                    if(state && state.done)
+                    {
+                        txt+=`<br><br><u>Ricordarsi di rimuovere il nodo <b>${from.name}.${from.domain}</b> dal DNS</u>`
+                    }
+                }
+            }
+            else{
+                txt+="Richiesta NON GESTITA"
+            }
+        
         }
 
+      
         map["PROCESS_RESULT"]=txt;
        
                               

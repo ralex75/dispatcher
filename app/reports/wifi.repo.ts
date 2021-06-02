@@ -1,5 +1,5 @@
 import {Report} from './report'
-import {ProcessResultStatus} from '../processors/processor'
+import {ProcessResultStatus} from '../processors/process-result'
 import moment from 'moment';
 
 const DATE_FORMAT="DD/MM/YYYY";
@@ -44,7 +44,6 @@ class WiFiReport extends Report{
         {
             var value=JSON.stringify(this.processResult.getValue());
             txt+= this.processResult.getStatus()==ProcessResultStatus.OK ? `${value}` : "NON GESTITA"
-           
         }
       
         map["PROCESS_RESULT"]=txt;

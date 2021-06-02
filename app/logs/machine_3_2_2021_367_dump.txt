@@ -1,0 +1,143 @@
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+Changing state from END to EXIT
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+no other hosts connected to port.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+
+
+================================================================================
+Created processing machine DeleteMachineState for request ID:367
+================================================================================
+Changing state from START to CHECK_SOURCE_PORT
+querying port 03-AP-02-039 from DB...done.
+no other hosts connected to port.
+Changing state from CHECK_SOURCE_PORT to DISABLE_SOURCE_PORT
+disabling switch port swape03#36....failed.
+Changing state from DISABLE_SOURCE_PORT to ERROR
+connect ECONNREFUSED 127.0.0.1:5000
+Changing state from ERROR to END
+================================================================================
+DONE
+================================================================================
+

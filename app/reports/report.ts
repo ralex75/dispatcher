@@ -1,11 +1,7 @@
 
-import {iProcessResult} from '../processors/processor'
-/*import {WiFiReport} from './wifi.repo'
-import {IPReport} from './ip.repo'
-import {AccountReport} from './acc.repo'*/
+import {iProcessResult} from '../processors/process-result'
 import fs from 'fs';
 const path =require('path');
-
 
 enum RenderType {"BASIC","ADVANCED"}
 
