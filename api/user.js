@@ -94,18 +94,21 @@ var parseLDAPUserInfo=function (user) {
        
     }
 
-    //cerca ruolo
+    //recupera ruolo
     if(isMemberOf){
 
-       
+       _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
         
-        _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
-        
+        /*if(e.indexOf("i:infn:roma1:servizio_calcolo_e_reti")>-1)
+        {
+            isAdmin=true;
+        }*/
 
         _isMemberOf.forEach(e=>{
             let match=e.match(/i:infn:roma1::([d|o|a|v])\:(\w+)/);
             if(match) {role = match[2]}
         })
+
 
     }
 

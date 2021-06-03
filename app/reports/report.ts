@@ -4,7 +4,8 @@ import {iProcessResult} from '../processors/processor'
 import {IPReport} from './ip.repo'
 import {AccountReport} from './acc.repo'*/
 import fs from 'fs';
-const path =require('path');
+const path = require('path');
+const {parseLDAPUserInfo} = require ('../api/uitemplate')
 
 
 enum RenderType {"BASIC","ADVANCED"}
@@ -39,7 +40,6 @@ abstract class Report
         var filePath=`server/text/${RenderType[type]}/${fileName}`
         filePath=path.resolve(filePath.toLowerCase());
 
-       
         if(!fs.existsSync(filePath)){
             throw Error(`Missing file template: ${filePath}`);
         }
@@ -49,6 +49,9 @@ abstract class Report
         this.subject=md['SUBJ'] || ""
         txt=this.replaceFieldValues(txt,md)
         txt=txt.replace(/\[USER_FULL_NAME\]/gi,`${this.user.name} ${this.user.surname}`)
+
+        txt=txt.replace(/\[USER_INFO\]/gi,`${parseLDAPUserInfo(this.user)}`)
+
 
         return txt;
 
