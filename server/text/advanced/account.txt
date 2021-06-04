@@ -1,8 +1,17 @@
 <pre>
 Tipo di richiesta: <b>Creazione Account</b>
-=================================================================
-[USER_INFO]
-=================================================================
+
+=============================================
+Cognome          = [SURNAME]
+Nome             = [NAME]
+Indirizzi email  = [EMAIL_ALT]
+Telefono         = [PHONE]
+UID              = [UID]
+INFN UUID        = [INFNUUID]
+Ruolo            = [ROLE]
+Scadenza         = [EXPIRATION]
+
+=============================================
 Indirizzo email richiesto = [EMAIL]
 Recupero  dati  richiesto = [RESTORE_ITA]
 </pre>
