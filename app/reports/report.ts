@@ -5,7 +5,7 @@ import {IPReport} from './ip.repo'
 import {AccountReport} from './acc.repo'*/
 import fs from 'fs';
 const path = require('path');
-const {parseLDAPUserInfo} = require ('../api/uitemplate')
+const {templates} = require ('../api/templates')
 
 
 enum RenderType {"BASIC","ADVANCED"}
@@ -50,7 +50,9 @@ abstract class Report
         txt=this.replaceFieldValues(txt,md)
         txt=txt.replace(/\[USER_FULL_NAME\]/gi,`${this.user.name} ${this.user.surname}`)
 
-        txt=txt.replace(/\[USER_INFO\]/gi,`${parseLDAPUserInfo(this.user)}`)
+        if(type==RenderType.ADVANCED){
+            txt=txt.replace(/\[USER_INFO\]/gi,`${templates.userInfo(this.user)}`)
+        }
 
 
         return txt;
