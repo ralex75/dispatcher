@@ -50,9 +50,6 @@ abstract class Report
         txt=this.replaceFieldValues(txt,md)
         txt=txt.replace(/\[USER_FULL_NAME\]/gi,`${this.user.name} ${this.user.surname}`)
 
-        txt=txt.replace(/\[USER_INFO\]/gi,`${parseLDAPUserInfo(this.user)}`)
-
-
         return txt;
 
     }
