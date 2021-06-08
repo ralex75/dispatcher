@@ -16,8 +16,8 @@ Tipo di richiesta: <b>WIFI Temporaneo</b>
 
 ================== DATI DELLA RICHIESTA =======================
 
-A partire dal    = [FROM]
-     fino al     = [TO]
+A partire dal      : [FROM]
+     fino al       : [TO]
 
 ================================================================
 
