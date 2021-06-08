@@ -7,8 +7,8 @@ Tipo di richiesta: <b>Creazione Account</b>
 
 ================== DATI ACCOUNT ===============================
 
-Indirizzo email richiesto : [EMAIL]
-Recupero  dati  richiesto : [RESTORE_ITA]
+Indirizzo email : [EMAIL]
+Recupero  dati  : [RESTORE_ITA]
 </pre>
 
 [RESTORE_MAIL_PROCEDURE]
