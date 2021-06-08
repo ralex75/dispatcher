@@ -6,18 +6,18 @@ const moment = require('moment')
 
 
 const sshConf={
-		host: 'freezer.roma1.infn.it',
-		username: 'root',
-		password: '4h34dBCK',
-		baseDir: '/data/vm+servizi/bckuser'
-	};
+    host: 'freezer.roma1.infn.it',
+    username: 'root',
+    identity: '/root/.ssh/id_rsa',
+    baseDir: '/data/vm+servizi/bckuser'
+};
 
 
 router.get("/options",async (req,res)=>{
     let userid=req.userid; //infnUUID
     let username=""
     let restoreOpts=[]
-    const MIN_SIZE=120000 //bytes
+    let MIN_SIZE=1200000 //bytes
     const GRACE_TIME=365; //days
     
     try
@@ -46,6 +46,8 @@ router.get("/options",async (req,res)=>{
 
             //array: file size - file name
             data=data.split("\n")
+
+            console.log(data)
 
             data.forEach(i=>{
                 let file=i.split(" ")
