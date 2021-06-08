@@ -90,8 +90,8 @@ var parseLDAPUserInfo=function (user) {
          
         }
 
-        cuser["expiration"]=minTime;
-       
+        cuser["expiration"]= (minTime=='nolimit' ? 'nessuna' : minTime);
+        
     }
 
     //recupera ruolo
@@ -103,10 +103,13 @@ var parseLDAPUserInfo=function (user) {
         {
             isAdmin=true;
         }*/
+        let roles={"d":"dipendente","o":"ospite","a":"associato","v":"visitatore"}
 
         _isMemberOf.forEach(e=>{
-            let match=e.match(/i:infn:roma1::([d|o|a|v])\:(\w+)/);
-            if(match) {role = match[2]}
+            let match=e.match(/i:infn:roma1::([d|o|a|v])/);
+            if(match) {
+                role = roles[match[1]] || null
+            }
         })
 
 

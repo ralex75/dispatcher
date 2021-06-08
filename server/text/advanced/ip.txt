@@ -1,27 +1,25 @@
 
 Tipo di richiesta: <b>[ACTION_ITA]</b>
 
-====================  gestore del nodo  =====================
-Nome               = [NAME]
-Cognome            = [SURNAME]
-Email              = [EMAIL]
-Telefono           = [PHONE]
+================== INFORMAZIONI UTENTE ========================
 
-====================  ubicazione del nodo  ==================
-Edificio           = [BUILD]
-Piano              = [FLOOR]
-Stanza             = [ROOM]
-Presa di rete      = [PORT]
+[USER_INFO]
 
-====================  dati del nodo  =========================
-Mac Address        = [H_MAC]
-Identificativo     = [H_NAME]
-Configurazione     = [CONFIG]
+================== DATI DELLA RICHIESTA =======================
 
-====================  note  ==================================
+Edificio           : [BUILD]
+Piano              : [FLOOR]
+Stanza             : [ROOM]
+Presa di rete      : [PORT]
+Mac Address        : [H_MAC]
+Identificativo     : [H_NAME]
+Configurazione     : [CONFIG]
+
+================== NOTE DELLA RICHIESTA =======================
+
 [NOTE]
 
-==============================================================
+===============================================================
 
 <pre>[USE_MAC_BUSY]</pre>
 

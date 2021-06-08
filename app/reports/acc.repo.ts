@@ -31,8 +31,8 @@ class AccountReport extends Report{
                     "EXPIRATION":user.expiration,
                     "INFNUUID":user.uuid,
                     "ROLE":user.role,
-                    "RESTORE_ITA":restore_ita[data.restore] || 'Nessuno',
-                    "RESTORE_ENG":restore_eng[data.restore] || 'None',
+                    "RESTORE_ITA":restore_ita[data.restore] || 'nessuno',
+                    "RESTORE_ENG":restore_eng[data.restore] || 'none',
                     "RESTORE_MAIL_PROCEDURE":""
                 }
 
@@ -50,22 +50,22 @@ class AccountReport extends Report{
             let bckmailuser=`${user.uid}-mailbox.tgz`
             let restore_mail_procedure=`
             
-                                        ======= Procedura di ripristino mail ================||
+                                        ================== PROCEDURA DI RIPRISTINO MAIL ===============
+                                        
+                                        <u>ATTENZIONE!!! - Eseguire questi passi solo DOPO aver creato l'account e prima di inviare la mail di test.</u>
 
-                                        <u>ATTENZIONE!!! - Eseguire questi passi solo DOPO aver creato l'account e prima di inviare la mail di test.</u>||
-
-                                        - collegarsi su freezer2|
-                                        - <b>cd /data/vm+servizi/bckuser/${user.uid}</b>|
-                                        - <b>scp ${bckmailuser}  root@mailbox:. </b>|
-                                        - collegarsi su mailbox|
-                                        - <b>cd /var/imap</b>|
-                                        - <b>tar xzvf /root/${bckmailuser}</b>| 
-                                        - <b>cd</b>|
-                                        - <b>rm ${bckmailuser}</b>|
-                                        =====================================================|
+                                        - collegarsi su freezer2
+                                        - <b>cd /data/vm+servizi/bckuser/${user.uid}</b>
+                                        - <b>scp ${bckmailuser}  root@mailbox:. </b>
+                                        - collegarsi su mailbox
+                                        - <b>cd /var/imap</b>
+                                        - <b>tar xzvf /root/${bckmailuser}</b>
+                                        - <b>cd</b>
+                                        - <b>rm ${bckmailuser}</b>
                                         
                                         `
-            map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure.split("|").map(e=>e.trim()).join("<br>")
+
+            map["RESTORE_MAIL_PROCEDURE"]=restore_mail_procedure.split("\n").map(e=>e.trim()).join("\n")
             
         }
        

@@ -6,7 +6,8 @@ function sendMail(from,to,subj,body){
     to="alessandro.ruggieri@roma1.infn.it"
     
     let to_arr=to.split(";")
-    
+    //console.log("Mailer is sending to:",to_arr)
+
     let transporter = nodeMailer.createTransport({
         host: 'smtp.roma1.infn.it',
         port: 25
@@ -19,15 +20,13 @@ function sendMail(from,to,subj,body){
         html:body
     }
 
-    
 
     return new Promise(function(resolve,reject){
         transporter.sendMail(mailOptions, (error, info) => {
-            
             if (error) {
-                return reject({'success': false,'exc':error});
+                reject({success: false});
             } else {
-                return resolve({'success': true})
+                resolve({success: true})
             }
         });
     })
