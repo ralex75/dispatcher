@@ -31,8 +31,8 @@ class AccountReport extends Report{
                     "EXPIRATION":user.expiration,
                     "INFNUUID":user.uuid,
                     "ROLE":user.role,
-                    "RESTORE_ITA":restore_ita[data.restore] || 'Nessuno',
-                    "RESTORE_ENG":restore_eng[data.restore] || 'None',
+                    "RESTORE_ITA":restore_ita[data.restore] || 'nessuno',
+                    "RESTORE_ENG":restore_eng[data.restore] || 'none',
                     "RESTORE_MAIL_PROCEDURE":""
                 }
 
