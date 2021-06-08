@@ -1,14 +1,16 @@
 <pre>
 Tipo di richiesta: <b>Creazione Account</b>
 
-================== IDENTIFICATIVO UTENTE ======================
+================== INFORMAZIONI UTENTE ========================
 
 [USER_INFO]
 
-================== DATI ACCOUNT ===============================
+================== DATI DELLA RICHIESTA =======================
 
 Indirizzo email : [EMAIL]
 Recupero  dati  : [RESTORE_ITA]
+
+===============================================================
 </pre>
 
 [RESTORE_MAIL_PROCEDURE]

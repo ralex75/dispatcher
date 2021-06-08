@@ -10,9 +10,10 @@ function userInfo(user){
     
     let txt=`
         
-        Nominativo         : ${user.name} ${user.surname}
-        uid                : ${valueOrDefault(user.uid)}
-        infnUUID           : ${user.uuid}
+        Nome               : ${user.name} 
+        Cognome            : ${user.surname}
+        UID                : ${valueOrDefault(user.uid)}
+        INFN UUID          : ${user.uuid}
         Email              : ${valueOrDefault(user.email)}
         Email alternativi  : ${valueOrDefault(userEmails)}
         Telefono           : ${valueOrDefault(user.phone)}

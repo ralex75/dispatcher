@@ -1,28 +1,25 @@
 
 Tipo di richiesta: <b>[ACTION_ITA]</b>
 
-================== IDENTIFICATIVO UTENTE ======================
+================== INFORMAZIONI UTENTE ========================
 
 [USER_INFO]
 
-================== LOCAZIONE NODO =============================
+================== DATI DELLA RICHIESTA =======================
 
 Edificio           : [BUILD]
 Piano              : [FLOOR]
 Stanza             : [ROOM]
 Presa di rete      : [PORT]
-
-================== DATI DEL NODO ==============================
-
 Mac Address        : [H_MAC]
 Identificativo     : [H_NAME]
 Configurazione     : [CONFIG]
 
-================== NOTE ========================================
+================== NOTE DELLA RICHIESTA =======================
 
 [NOTE]
 
-================================================================
+===============================================================
 
 <pre>[USE_MAC_BUSY]</pre>
 
