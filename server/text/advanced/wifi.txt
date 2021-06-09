@@ -10,14 +10,16 @@ pre {
 
 Tipo di richiesta: <b>WIFI Temporaneo</b>
 
-==============================================
-Cognome          = [SURNAME]
-Nome             = [NAME]
-Indirizzo email  = [EMAIL]
-Telefono         = [PHONE]
-A partire dal    = [FROM]
-     fino al     = [TO]
+================== INFORMAZIONI UTENTE ========================
 
+[USER_INFO]
+
+================== DATI DELLA RICHIESTA =======================
+
+A partire dal      : [FROM]
+     fino al       : [TO]
+
+================================================================
 
 <pre>
 [PROCESS_RESULT]

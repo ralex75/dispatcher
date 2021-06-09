@@ -36,7 +36,7 @@ class WiFiReport extends Report{
         var map:any=await this.mapBasicData(user,data);
         
 
-        txt="=====================  <b>Esito esecuzione automatica</b>  ====================<br>"
+        txt="<b>Esito esecuzione automatica</b><br>"
 
         //var procResultData:string=map["processResult"] || null;
         //console.log("pr:",this.processResult);
