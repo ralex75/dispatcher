@@ -18,7 +18,7 @@ const getUser=async function(uid)
 
             user=parseLDAPUserInfo(users_ldap[0])
 
-            console.log(user)
+            //console.log(user)
 
             delete user['isMemberOf']
             delete user["schacUserStatus"];
@@ -34,17 +34,58 @@ const getUser=async function(uid)
    
 };
 
+//ritorna UTENTE LDAP
+const getUsers=async function(keywords)
+{
+
+    let users=[];
+    let ldapFilter= "";
+
+    if(!keywords) return users;
+
+    let k=keywords
+   
+    ldapFilter+=`(|(cn=*${k}*)(mail=${k})(schacPersonalUniqueID=*:CF:${k})(infnUUID=${k})(mailAlternateAddress=${k}))`
+    
+
+    try{
+
+            
+            //LDAP
+            let _users=await getUserLDAP(ldapFilter);
+
+            _users.forEach(u=>{
+                let _user=parseLDAPUserInfo(u)
+                
+                delete _user['isMemberOf']
+                delete _user["schacUserStatus"];
+
+                //console.log(_user)
+                users.push(_user)
+            })
+            
+        }
+        catch(exc){
+            console.log("exc:",exc);
+            throw exc;
+        }
+
+    return users;
+   
+};
+
 
 var parseLDAPUserInfo=function (user) {
     
-    var cuser=Object.assign({}, user);
 
-    console.log(cuser)
+    let cuser=Object.assign({}, user);
+
+    //console.log(cuser)
     
     //var minTime="01/01/1900"
-    var userStatus=user.schacUserStatus;
+    let userStatus=user.schacUserStatus;
     
-    console.log("mail alternates:",cuser.mailAlternates)
+    //console.log("mail alternates:",cuser.mailAlternates)
     
     //rimuove dall'alternateMailAddress se esiste mail principale per evitare duplicati
     cuser.mailAlternates=cuser.mailAlternates.map(e=>e.toLowerCase())
@@ -60,7 +101,8 @@ var parseLDAPUserInfo=function (user) {
     let isMemberOf=user.isMemberOf;
     let role="";            //ruolo
     let isAdmin=false       //se appartiene al cc
-    let minTime="01/01/1900"
+    let defaultMinTime="01/01/1900"
+    let minTime=defaultMinTime
  
     //REG VALIDATIONS
     let regx={"policies":/disciplinare-it/,
@@ -90,7 +132,7 @@ var parseLDAPUserInfo=function (user) {
          
         }
 
-        cuser["expiration"]= (minTime=='nolimit' ? 'nessuna' : minTime);
+        cuser["expiration"]= (minTime=='nolimit' ? 'nessuna' : minTime==defaultMinTime ? "" : minTime);
         
     }
 
@@ -98,17 +140,16 @@ var parseLDAPUserInfo=function (user) {
     if(isMemberOf){
 
        _isMemberOf = !Array.isArray(isMemberOf) ? [isMemberOf] : isMemberOf;
-        
-        /*if(e.indexOf("i:infn:roma1:servizio_calcolo_e_reti")>-1)
-        {
-            isAdmin=true;
-        }*/
+     
         let roles={"d":"dipendente","o":"ospite","a":"associato","v":"visitatore"}
 
         _isMemberOf.forEach(e=>{
             let match=e.match(/i:infn:roma1::([d|o|a|v])/);
             if(match) {
                 role = roles[match[1]] || null
+            }
+            if(e.match(/i:infn:roma1:servizio_calcolo_e_reti::n:member/)){
+                isAdmin=true;
             }
         })
 
@@ -118,7 +159,7 @@ var parseLDAPUserInfo=function (user) {
     //controllo se autorizzato
     const {loa2, itsec, policies, gracetime} = cuser;
     
-    let isAuthorized = role && loa2 && policies;
+    let isAuthorized = role!=='' && loa2 && policies;
 
     if(isAuthorized && !itsec)
     {
@@ -128,7 +169,7 @@ var parseLDAPUserInfo=function (user) {
 
     cuser["isAuthorized"]=isAuthorized
     cuser["role"]=role;
-    //cuser["isAdmin"]=isAdmin;
+    cuser["isAdmin"]=isAdmin;
 
     delete cuser["isMemberOf"]
     delete cuser["schacUserStatus"];
@@ -139,6 +180,6 @@ var parseLDAPUserInfo=function (user) {
 
 
 
-module.exports={getUser}
+module.exports={getUser,getUsers}
 
 
