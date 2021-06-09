@@ -15,7 +15,7 @@ function userInfo(user){
         UID                : ${valueOrDefault(user.uid)}
         INFN UUID          : ${user.uuid}
         Email              : ${valueOrDefault(user.email)}
-        Email alternativi  : ${valueOrDefault(userEmails).split(";").join(`\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp`)}
+        Email alternativi  : ${valueOrDefault(userEmails).split(";").join(`\n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`)}
         Telefono           : ${valueOrDefault(user.phone)}
         Ruolo              : ${valueOrDefault(user.role)}
         Scadenza           : ${valueOrDefault(user.expiration)}
