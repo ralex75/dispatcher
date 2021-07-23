@@ -23,6 +23,8 @@ export const ReadRequests=function(){
 
 interface iError{
 	type:string,
+	from?:string,
+	data:any,
 	value:string
 }
 
@@ -46,7 +48,9 @@ const handleRequest= async function(r:any){
 
 	let userEmails:string [] | null=null;
 	let suppEmail="alessandro.ruggieri@roma1.infn.it;"
-		
+	
+	let userMailAddr="";
+	
 	try{
 
 		if(!uid || !rtype || !data){
@@ -55,7 +59,7 @@ const handleRequest= async function(r:any){
 		}
 		
 		//recupera utente da LDAP
-		var user=await getUser(uid);
+		let user=await getUser(uid);
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
@@ -64,7 +68,7 @@ const handleRequest= async function(r:any){
 
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
-		let userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
+		userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
 
 		userMailAddr=userMailAddr || user.email;
 		
@@ -105,7 +109,7 @@ const handleRequest= async function(r:any){
 		}
 		catch(exc)
 		{
-			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
+			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc)),"data":data})
 		}
 
 		
@@ -153,14 +157,14 @@ const handleRequest= async function(r:any){
 	catch(exc)
     {
 		console.log(exc);
-		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
+		let from = !userMailAddr ? "dispatcher" : userMailAddr
+		errors.push({"type":"request","from":from,"data":data,"value":(exc.message || JSON.stringify(exc))})
     }
     finally
     {
 
 		times.process=moment()
-		let err=errors.length>0 ? JSON.stringify(errors) : null;
-
+		
 		errors.forEach(async err=>
 		{
 			

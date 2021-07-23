@@ -14,7 +14,38 @@ var helpers={
         })
     },
 
-    
+    getHost:function(mac:string){
+        return new Promise((resolve)=>{ 
+            let host_mac=mac.toLowerCase();
+            db.any(`select loc_id ,loc_building as "build",loc_floor as "floor",loc_name, host_name,host_domain,host_mac,pp_port_code from vw_network_status_ex_3 where lower(host_mac::text)=lower($1)`,[host_mac])
+            .then(function(res:any){
+                 resolve(res[0] || null);
+            })
+        })
+    },
+
+    dnsLookup:function(name:string){
+            
+        const dns = require("dns");
+        return new Promise((res,rej)=>{
+            dns.resolve(name,(err:any,addr:any)=>{
+                
+                if(err)
+                {
+                    console.log(err)
+                    let ecode=err.errno || err.code
+                    if(ecode!='ENOTFOUND')
+                    {
+                        rej(err);
+                    }
+                    
+                }
+                res(addr || null);
+            })
+        })
+            
+        
+    },
 
     getPortNetwork:function(port_code:string){
         return new Promise((resolve)=>{
