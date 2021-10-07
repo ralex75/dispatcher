@@ -24,9 +24,11 @@ export const ReadRequests=function(){
 
 interface iError{
 	type:string,
+	id?:number,
 	from?:string,
 	data:any,
-	value:string
+	value:string,
+	user?:any,
 }
 
 const handleRequest= async function(r:any){
@@ -51,6 +53,7 @@ const handleRequest= async function(r:any){
 	let suppEmail="alessandro.ruggieri@roma1.infn.it;"
 	
 	let userMailAddr="";
+	let user:any=null;
 	
 	try{
 
@@ -60,7 +63,7 @@ const handleRequest= async function(r:any){
 		}
 		
 		//recupera utente da LDAP
-		let user=await getUser(uid);
+		user=await getUser(uid);
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
@@ -72,6 +75,8 @@ const handleRequest= async function(r:any){
 		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
 
 		userMailAddr=userMailAddr || user.email;
+
+		userMailAddr=""
 
 		if(!userMailAddr){ throw new Error("User mail address is empty") }
 		
@@ -166,7 +171,8 @@ const handleRequest= async function(r:any){
     {
 		console.log(exc);
 		let from = !userMailAddr ? "dispatcher" : userMailAddr
-		errors.push({"type":"request","from":from,"data":data,"value":(exc.message || JSON.stringify(exc))})
+		let _user={"uid":user.uid,"uuid":user.uuid,"name":user.name,"surname":user.surname}
+		errors.push({"type":"request","id":r.id,"from":from,"data":data,"value":(exc.message || JSON.stringify(exc)),"user":_user})
     }
     finally
     {
