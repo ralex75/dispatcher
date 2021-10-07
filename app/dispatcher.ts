@@ -164,6 +164,8 @@ const handleRequest= async function(r:any){
 
 		times.process=moment()
 		
+		let err=errors.length>0 ? JSON.stringify(errors) : null;
+		
 		errors.forEach(err=>
 		{
 			
@@ -181,9 +183,9 @@ const handleRequest= async function(r:any){
 		})
 		
 
-		helpers.setDispatchResult(id,times.notific,times.process,JSON.stringify(errors))
+		helpers.setDispatchResult(id,times.notific,times.process,err)
 
-		console.log(`${errors.length>0 ? "error": "done"} request id: ${r.id}`)
+		console.log(`${err ? "error": "done"} request id: ${r.id}`)
     }
 }
 
