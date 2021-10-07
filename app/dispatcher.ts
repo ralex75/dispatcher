@@ -4,6 +4,7 @@ import {Report,RenderType} from './reports/report'
 import {ReportFactory} from './reports/factory.repo'
 import {ProcessRequest, ProcessResultStatus} from './processors/processor'
 import {helpers} from './helpers'
+import { couldStartTrivia } from 'typescript';
 const {getUser} = require('./../api/user')
 
 
@@ -23,9 +24,11 @@ export const ReadRequests=function(){
 
 interface iError{
 	type:string,
+	id?:number,
 	from?:string,
 	data:any,
-	value:string
+	value:string,
+	user?:any,
 }
 
 const handleRequest= async function(r:any){
@@ -49,6 +52,7 @@ const handleRequest= async function(r:any){
 	let userEmails:string [] | null=null;
 	let userMailAddr:string="";
 	let suppEmail="supporto@roma1.infn.it"
+	let user:any=null;
 		
 	try{
 
@@ -58,11 +62,11 @@ const handleRequest= async function(r:any){
 		}
 		
 		//recupera utente da LDAP
-		let user=await getUser(uid);
+		user=await getUser(uid);
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
-		
+				
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
 		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
@@ -157,32 +161,29 @@ const handleRequest= async function(r:any){
     {
 		console.log(exc);
 		let from = !userMailAddr ? "dispatcher" : userMailAddr
-		errors.push({"type":"request","from":from,"data":data,"value":(exc.message || JSON.stringify(exc))})
+		let _user={"uid":user.uid,"uuid":user.uuid,"name":user.name,"surname":user.surname}
+		errors.push({"type":"request","id":r.id,"from":from,"data":data,"value":(exc.message || JSON.stringify(exc)),"user":_user})
     }
     finally
     {
 
 		times.process=moment()
-		
-		let err=errors.length>0 ? JSON.stringify(errors) : null;
-		
-		errors.forEach(err=>
+		let err= errors.length>0 ? JSON.stringify(errors) : null;
+
+		errors.forEach(async err=>
 		{
 			
 			let errTxt=JSON.stringify(err);
-			
-			/*
-			if(err.type=="request" && userEmails!=null)
-			{
-				helpers.sendReport(userEmails.join(";"),`Errore invio richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);	
-			}*/
-
-			//let to=user ? user.email : "alessandro.ruggieri@roma1.infn.it";//"supporto@®roma1.infn.it"
-			helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
+		
+			try{
+				await helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
+			}
+			catch(exc){
+				console.log(exc);
+			}
 	
 		})
-		
-
+				
 		helpers.setDispatchResult(id,times.notific,times.process,err)
 
 		console.log(`${err ? "error": "done"} request id: ${r.id}`)
