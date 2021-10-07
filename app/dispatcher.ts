@@ -4,6 +4,7 @@ import {Report,RenderType} from './reports/report'
 import {ReportFactory} from './reports/factory.repo'
 import {ProcessRequest, ProcessResultStatus} from './processors/processor'
 import {helpers} from './helpers'
+import { couldStartTrivia } from 'typescript';
 const {getUser} = require('./../api/user')
 
 
@@ -66,11 +67,13 @@ const handleRequest= async function(r:any){
 		
 		if(!userEmails[0]) throw new Error("User email address not found.")
 
-		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
+			//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
-		userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
+		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
 
 		userMailAddr=userMailAddr || user.email;
+
+		if(!userMailAddr){ throw new Error("User mail address is empty") }
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
@@ -169,19 +172,13 @@ const handleRequest= async function(r:any){
     {
 
 		times.process=moment()
-		
+		let err= errors.length>0 ? JSON.stringify(errors) : null;
+
 		errors.forEach(async err=>
 		{
 			
 			let errTxt=JSON.stringify(err);
-			
-			/*
-			if(err.type=="request" && userEmails!=null)
-			{
-				helpers.sendReport(userEmails.join(";"),`Errore invio richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);	
-			}*/
-
-			//let to=user ? user.email : "alessandro.ruggieri@roma1.infn.it";//"supporto@®roma1.infn.it"
+		
 			try{
 				await helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
 			}
@@ -191,6 +188,7 @@ const handleRequest= async function(r:any){
 	
 		})
 		
+		console.log(`${err ? "error" : "done"} request ${r.id}`)
 
 		//helpers.setDispatchResult(id,times.notific,times.process,err)
 
