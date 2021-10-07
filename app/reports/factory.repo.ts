@@ -1,6 +1,7 @@
 import {WiFiReport} from './wifi.repo'
 import {IPReport} from './ip.repo'
 import {AccountReport} from './acc.repo'
+import {EnaDPortReport} from './dport.repo'
 
 class ReportFactory
 {
@@ -10,6 +11,9 @@ class ReportFactory
         {
             case "IP":
                 return new IPReport(user,data)
+            break;
+            case "DPORT":
+                return new EnaDPortReport(user,data)
             break;
             case "WIFI":
                 return new WiFiReport(user,data)

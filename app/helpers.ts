@@ -24,6 +24,16 @@ var helpers={
         })
     },
 
+    //nodi appartenenti utente
+    getUserDHCPHosts:function(uuid:string){
+        return new Promise((resolve)=>{ 
+            db.any(`select host_mac from vw_network_status_ex_3 where lower(admin_cf::text)=lower($1) and host_is_dhcp is true`,[uuid])
+            .then(function(res:any){
+                 resolve(res);
+            })
+        })
+    },
+
     dnsLookup:function(name:string){
             
         const dns = require("dns");

@@ -83,7 +83,7 @@ const handleRequest= async function(r:any){
 
 		
 		// inizializza il processatore della richiesta
-		let processor=null;
+		let processor:any=null;
 		
 		//******** Processamento automatico della richiesta **********//
 		try
@@ -95,19 +95,22 @@ const handleRequest= async function(r:any){
 			
 			//gestione automatica della richiesta (se implementato)
 			//ritorna oggetto di tipo report (wifi,account o IP)
-			report=await processor.exec();
-
-			console.log(`Processed Request ID: ${id} - ${rtype}`)
-
-			
-			if(report.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+			if(processor)
 			{
-				console.log("Eccezione processamento")
-				throw new Error(report.processResult.getValue());
+				report=await processor.exec();
+
+				console.log(`Processed Request ID: ${id} - ${rtype}`)
+
+				
+				if(report?.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+				{
+					console.log("Eccezione processamento")
+					throw new Error(report.processResult.getValue());
+				}
 			}
 
 		}
-		catch(exc)
+		catch(exc:any)
 		{
 			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc)),"data":data})
 		}
@@ -128,6 +131,8 @@ const handleRequest= async function(r:any){
 
 		//advanced report => admin
 		var advrepo = await report.renderAs(RenderType.ADVANCED);
+
+		
 
 		//default mail subject
 		var mailSubj=`Richiesta ID ${id} - ${rtype}`;
@@ -154,7 +159,7 @@ const handleRequest= async function(r:any){
 		
 		console.log("Done.")
 	}
-	catch(exc)
+	catch(exc:any)
     {
 		console.log(exc);
 		let from = !userMailAddr ? "dispatcher" : userMailAddr

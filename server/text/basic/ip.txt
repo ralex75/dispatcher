@@ -55,7 +55,7 @@ Phone              = [PHONE]
 Building           = [BUILD]
 Floor              = [FLOOR]
 Room               = [ROOM]
-Port               = [PORT]
+Network Port       = [PORT]
 
 ====================  host data  ============================
 Mac Address        = [H_MAC]
