@@ -4,7 +4,6 @@ import {Report,RenderType} from './reports/report'
 import {ReportFactory} from './reports/factory.repo'
 import {ProcessRequest, ProcessResultStatus} from './processors/processor'
 import {helpers} from './helpers'
-import { couldStartTrivia } from 'typescript';
 const {getUser} = require('./../api/user')
 
 
