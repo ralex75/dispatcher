@@ -62,7 +62,7 @@ const handleRequest= async function(r:any){
 		
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
-		let userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
+		let userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0]
 
 		userMailAddr=userMailAddr || user.email;
 
@@ -78,7 +78,7 @@ const handleRequest= async function(r:any){
 
 		
 		// inizializza il processatore della richiesta
-		let processor=null;
+		let processor:any|null=null;
 		
 		//******** Processamento automatico della richiesta **********//
 		try
@@ -95,14 +95,14 @@ const handleRequest= async function(r:any){
 			console.log(`Processed Request ID: ${id} - ${rtype}`)
 
 			
-			if(report.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+			if(report?.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
 			{
 				console.log("Eccezione processamento")
 				throw new Error(report.processResult.getValue());
 			}
 
 		}
-		catch(exc)
+		catch(exc:any)
 		{
 			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
 		}
@@ -146,7 +146,7 @@ const handleRequest= async function(r:any){
 		
 
 	}
-	catch(exc)
+	catch(exc:any)
     {
 		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
     }
