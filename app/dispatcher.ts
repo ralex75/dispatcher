@@ -23,6 +23,8 @@ export const ReadRequests=function(){
 
 interface iError{
 	type:string,
+	from?:string,
+	data:any,
 	value:string
 }
 
@@ -45,6 +47,7 @@ const handleRequest= async function(r:any){
 	var times:any={"notific":null,"process":null}
 
 	let userEmails:string [] | null=null;
+	let userMailAddr:string="";
 	let suppEmail="supporto@roma1.infn.it"
 		
 	try{
@@ -55,17 +58,18 @@ const handleRequest= async function(r:any){
 		}
 		
 		//recupera utente da LDAP
-		var user=await getUser(uid);
+		let user=await getUser(uid);
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
 		
 		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
-		let userMailAddr=userEmails.filter(e=>e.match(/^a.b.c@roma1.infn.it/g))[0]
+		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
 
 		userMailAddr=userMailAddr || user.email;
 
+		if(!userMailAddr){ throw new Error("User mail address is empty") }
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
@@ -78,33 +82,34 @@ const handleRequest= async function(r:any){
 
 		
 		// inizializza il processatore della richiesta
-		let processor=null;
+		let processor:any=null;
 		
 		//******** Processamento automatico della richiesta **********//
 		try
 		{
 			//inizializza il processatore di richiesta
 			processor=ProcessRequest.initialize(rtype,user,data);
-
-			console.log(`Processing Request ID: ${id} - ${rtype}`)
-			
+					
 			//gestione automatica della richiesta (se implementato)
 			//ritorna oggetto di tipo report (wifi,account o IP)
-			report=await processor.exec();
-
-			console.log(`Processed Request ID: ${id} - ${rtype}`)
-
-			
-			if(report.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+			if(processor)
 			{
-				console.log("Eccezione processamento")
-				throw new Error(report.processResult.getValue());
+				report=await processor.exec();
+
+				console.log(`Processed Request ID: ${id} - ${rtype}`)
+
+				
+				if(report?.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+				{
+					console.log("Eccezione processamento")
+					throw new Error(report.processResult.getValue());
+				}
 			}
 
 		}
-		catch(exc)
+		catch(exc:any)
 		{
-			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
+			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc)),"data":data})
 		}
 
 		//se l'oggetto report non è stato creato (il process.exec ha generato errore)
@@ -120,6 +125,8 @@ const handleRequest= async function(r:any){
 
 		//advanced report => admin
 		var advrepo = await report.renderAs(RenderType.ADVANCED);
+
+		
 
 		//default mail subject
 		var mailSubj=`Richiesta ID ${id} - ${rtype}`;
@@ -146,16 +153,17 @@ const handleRequest= async function(r:any){
 		
 
 	}
-	catch(exc)
+	catch(exc:any)
     {
-		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
+		console.log(exc);
+		let from = !userMailAddr ? "dispatcher" : userMailAddr
+		errors.push({"type":"request","from":from,"data":data,"value":(exc.message || JSON.stringify(exc))})
     }
     finally
     {
 
 		times.process=moment()
-		let err=errors.length>0 ? JSON.stringify(errors) : null;
-
+		
 		errors.forEach(err=>
 		{
 			
@@ -173,9 +181,9 @@ const handleRequest= async function(r:any){
 		})
 		
 
-		helpers.setDispatchResult(id,times.notific,times.process,err)
+		helpers.setDispatchResult(id,times.notific,times.process,JSON.stringify(errors))
 
-		console.log("done request id: ",r.id)
+		console.log(`${errors.length>0 ? "error": "done"} request id: ${r.id}`)
     }
 }
 

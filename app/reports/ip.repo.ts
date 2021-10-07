@@ -1,7 +1,5 @@
 import {Report} from './report'
 import {helpers} from '../helpers'
-import { formatWithOptions } from 'util';
-
 
 class IPReport extends Report{
     
@@ -20,18 +18,51 @@ class IPReport extends Report{
 
         const HOST_CONFIG_MAP:any={"STATIC":"STATICO","DHCP":"DHCP","STATICVM":"STATICO - VIRTUALE"}
 
-        let loc:any=await helpers.getPortLocation(h.port);
       
-        if(!loc)
-        {
-            throw new Error(`No location found by port: ${h.port}`)
-        }
+      
+        
 
         if(action=='update'){
             hostname = from.name ? from.name+"."+from.domain : "DHCP  "+from.mac;
         }
 
-      
+       
+
+        //check valid input data
+        let loc:any=await helpers.getPortLocation(h.port);
+        let macExists=await helpers.getHost(h.mac)
+        let nameExists= (to && to.name) ? await helpers.dnsLookup(`${to.name}.${to.domain}`) : false;
+
+
+        if(action!='delete'){
+            
+            let msg=[`Request IP - ${action} - errors:`]
+            
+            if(macExists){
+                if(from && from.mac==to.mac){ macExists=false}
+                else
+                    msg.push(`duplicated mac ${h.mac}`)
+            }
+            
+            if(nameExists){
+                if(from && from.name==to.name && from.domain==to.domain){ nameExists=false}
+                else
+                    msg.push(`duplicated name ${to.name}.${to.domain}`)
+            }
+
+
+            if(macExists || nameExists)
+            {
+                throw new Error(msg.join(" "))
+            }
+        }
+
+        if(!loc)
+        {
+            throw new Error(`No location found by port: ${h.port}`)
+        }
+
+        //map data
         var map:any={
                     "ACTION_ITA":`${HOST_ACTION_MAP.ITA[action]} - ${hostname}`,
                     "ACTION_ENG":`${HOST_ACTION_MAP.ENG[action]} - ${hostname}`,

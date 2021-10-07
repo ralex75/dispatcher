@@ -3,6 +3,11 @@ const valueOrDefault=(value)=>{
     return value || "---"
 }
 
+const generateHtmlWhiteSpace=(count)=>{
+    if(!count || count<1) count=1
+    return [...Array(count).keys()].map(i=>"&nbsp;").join("")
+}
+
 function userInfo(user){
    
 
@@ -47,4 +52,4 @@ const templates={
 }
 
 
-module.exports = {templates}
+module.exports = {templates,generateHtmlWhiteSpace}

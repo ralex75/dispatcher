@@ -1,0 +1,31 @@
+<pre>
+Tipo di richiesta: <b>Attivazione presa di rete in DHCP</b>
+
+
+================== INFORMAZIONI UTENTE =====================================
+
+[USER_INFO]
+
+================== DATI DELLA RICHIESTA =====================================
+</pre>
+L'utente ha già i seguenti mac address registrati ed abilitati al DHCP 
+su altre prese di rete:
+    
+    [H_MAC_LIST]
+
+Limitarsi quindi ad abilitare la presa di rete richiesta in modalità DHCP 
+senza registrarci o spostarci sopra nessuno nodo.
+
+Infine, ricordarsi di rispondere a questa mail ad attivazione avvenuta.
+<pre>
+
+Edificio           : [BUILD]
+Piano              : [FLOOR]
+Stanza             : [ROOM]
+Presa di rete      : [PORT]
+
+=============================================================================
+
+</pre>
+
+
