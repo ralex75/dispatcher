@@ -21,7 +21,7 @@ const dump=(fileName,data)=>{
 router.post("/",(req,res)=>{
     let user=req.body.user;
     
-    user=getUser(user.uuid)
+    user= await getUser(user.uuid)
 
     if(!user) return  res.status(500).json({"err":`No user found`})
 
