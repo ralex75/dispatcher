@@ -14,7 +14,6 @@ export const ReadRequests=function(){
 
 	helpers.READ_ALL_REQUESTS().then(function(data:any){
 		data.forEach((r:any) => {
-			console.log("rid:",r.id);
 			handleRequest(r);
 		})
 	})
