@@ -67,16 +67,16 @@ const handleRequest= async function(r:any){
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
+
+		
 		
 		if(!userEmails[0]) throw new Error("User email address not found.")
 
 			//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
 		//campo mail
 		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
-
+		
 		userMailAddr=userMailAddr || user.email;
-
-		userMailAddr=""
 
 		if(!userMailAddr){ throw new Error("User mail address is empty") }
 		

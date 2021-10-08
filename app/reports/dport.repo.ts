@@ -24,8 +24,8 @@ class EnaDPortReport extends Report{
         //map data
         var map:any={
                     "SUBJ":`Attivazione presa di rete ${p}`,
-                    "SUBJ_ITA":`Attivazione presa di rete ${p} in modalità DHCP`,
-                    "SUBJ_ENG":`Enabling network port ${p} in DHCP mode`,
+                    "SUBJ_ITA":`Attivazione presa di rete ${p} in configurazione DHCP`,
+                    "SUBJ_ENG":`Enabling network port ${p} in DHCP configuration`,
                     "NAME":user.name,
                     "SURNAME":user.surname,
                     "EMAIL":user.email,
