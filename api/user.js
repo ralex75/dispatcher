@@ -18,7 +18,7 @@ const getUser=async function(uid)
 
             user=parseLDAPUserInfo(users_ldap[0])
 
-            //console.log(user)
+            console.log(user)
 
             delete user['isMemberOf']
             delete user["schacUserStatus"];
@@ -46,7 +46,8 @@ const getUsers=async function(keywords)
     let k=keywords
    
     ldapFilter+=`(|(cn=*${k}*)(uid=${k})(mail=${k})(schacPersonalUniqueID=*:CF:${k})(infnUUID=${k})(mailAlternateAddress=${k}))`
-        
+    
+
     try{
 
             
@@ -59,7 +60,7 @@ const getUsers=async function(keywords)
                 delete _user['isMemberOf']
                 delete _user["schacUserStatus"];
 
-                //console.log(_user)
+                console.log(_user)
                 users.push(_user)
             })
             
@@ -96,6 +97,7 @@ var parseLDAPUserInfo=function (user) {
     cuser.mailAlternates=ma.filter(e=>e.match(/\w+\.\w+@/)).sort()
                         .concat(ma.filter(e=>!e.match(/\w+\.\w+@/)).sort())
 
+    console.log("ma:",cuser.mailAlternates)                        
 
     let isMemberOf=user.isMemberOf;
     let role="";            //ruolo
@@ -115,7 +117,6 @@ var parseLDAPUserInfo=function (user) {
         for(let i=0;i<userStatus.length;i++){
 
             let ttl=regx.ttl.exec(userStatus[i]);
-           
             if(ttl && minTime!="nolimit"){
                 curTime=ttl[1];
                 if(curTime=="nolimit")
@@ -137,6 +138,8 @@ var parseLDAPUserInfo=function (user) {
         
     }
 
+    let siteRoles={}
+
     //recupera ruolo
     if(isMemberOf){
 
@@ -146,9 +149,14 @@ var parseLDAPUserInfo=function (user) {
 
         _isMemberOf.forEach(e=>{
             let match=e.match(/i:infn:(\w+)::([d|o|a|v])/);
+            console.log(match)
             if(match) {
                 site=match[1]
                 role = roles[match[2]] || null
+                if(role)
+                {
+                    siteRoles[site]=role
+                }
             }
             if(e.match(/i:infn:roma1:servizio_calcolo_e_reti/)){
                 isAdmin=true;
@@ -161,14 +169,14 @@ var parseLDAPUserInfo=function (user) {
     //controllo se autorizzato
     const {loa2, itsec, policies, gracetime} = cuser;
     
-    let isAuthorized = site=='roma1' && role!=='' && loa2 && policies && (itsec || gracetime);
+    let isAuthorized = ("roma1" in siteRoles) && loa2 && policies && (itsec || gracetime);
 
-    
 
     cuser["isAuthorized"]=isAuthorized
-    cuser["role"]=role;
-    cuser["roma1"]=(site=='roma1');
-    cuser["isAdmin"]=isAdmin;
+    cuser["role"]=siteRoles["roma1"];
+    cuser["roma1"]="roma1" in siteRoles;
+    cuser["isAdmin"]=isAdmin || true;
+    cuser["siteRoles"]=siteRoles
 
     delete cuser["isMemberOf"]
     delete cuser["schacUserStatus"];
