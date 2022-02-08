@@ -175,7 +175,7 @@ var parseLDAPUserInfo=function (user) {
     cuser["isAuthorized"]=isAuthorized
     cuser["role"]=siteRoles["roma1"];
     cuser["roma1"]="roma1" in siteRoles;
-    cuser["isAdmin"]=isAdmin || true;
+    cuser["isAdmin"]=isAdmin;
     cuser["siteRoles"]=siteRoles
 
     delete cuser["isMemberOf"]
