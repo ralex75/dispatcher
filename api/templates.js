@@ -3,6 +3,11 @@ const valueOrDefault=(value)=>{
     return value || "---"
 }
 
+const generateHtmlWhiteSpace=(count)=>{
+    if(!count || count<1) count=1
+    return [...Array(count).keys()].map(i=>"&nbsp;").join("")
+}
+
 function userInfo(user){
    
 
@@ -14,6 +19,7 @@ function userInfo(user){
         Cognome            : ${user.surname}
         UID                : ${valueOrDefault(user.uid)}
         INFN UUID          : ${user.uuid}
+        CF                 : ${(user.cf!=user.uid) ? valueOrDefault(user.cf) : "---"}
         Email              : ${valueOrDefault(user.email)}
         Email alternativi  : ${valueOrDefault(userEmails).split(";").join(`\n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`)}
         Telefono           : ${valueOrDefault(user.phone)}
@@ -29,7 +35,7 @@ function completeUserInfo(user){
    
     let txt=`${templates.userInfo(user)}
             -----------------------------------------------------------------
-            Ruolo roma1        : ${user.role ? 'SI' : 'NO'}
+            Afferenza Roma1    : ${user.roma1 ? 'SI' : 'NO'}
             LOA2               : ${user.loa2 ? 'SI' : 'NO'}
             Disciplinare       : ${user.policies ? 'SI' : 'NO'}
             Corso sicurezza    : ${user.itsec ? 'SI' : 'NO'}
@@ -47,4 +53,4 @@ const templates={
 }
 
 
-module.exports = {templates}
+module.exports = {templates,generateHtmlWhiteSpace}

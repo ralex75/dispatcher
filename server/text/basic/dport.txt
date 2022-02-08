@@ -1,0 +1,57 @@
+<pre>
+=== English version follows ===
+
+Gentile [USER_FULL_NAME],
+questa mail automatica è stata generata a seguito della sua richiesta presso il Servizio di Calcolo di Roma. 
+Di seguito viene riportato un sommario della richiesta effettuata:
+
+Tipo di richiesta: <b>[SUBJ_ITA]</b>
+
+==============  gestore dei nodi DHCP ==========================
+Nome               = [NAME]
+Cognome            = [SURNAME]
+Email              = [EMAIL]
+Telefono           = [PHONE]
+
+==============  ubicazione della presa   =======================
+Edificio           = [BUILD]
+Piano              = [FLOOR]
+Stanza             = [ROOM]
+
+================================================================
+
+In caso di domande o richieste potete contattare il servizio calcolo all'indirizzo supporto@roma1.infn.it
+
+Cordiali saluti,
+
+    SICR
+
+---------------------------------------------------------------------------------------------------------
+
+=== English version ===
+
+Dear [USER_FULL_NAME],
+this automatic email has been generated upon you request to the IT service in Roma. 
+Here it follows a summary of the request:
+
+Request type: <b>[SUBJ_ENG]</b>
+
+================= dhcp hosts owner  ========================
+Name               = [NAME]
+Surname            = [SURNAME]
+Email              = [EMAIL]
+Phone              = [PHONE]
+
+================= network port location  ==========================
+Building           = [BUILD]
+Floor              = [FLOOR]
+Room               = [ROOM]
+
+=============================================================
+
+In case of questions of requests you may contact the IT service by sending an email to supporto@roma1.infn.it
+
+Kind regards,
+
+    SICR
+</pre>

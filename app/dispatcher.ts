@@ -14,7 +14,6 @@ export const ReadRequests=function(){
 
 	helpers.READ_ALL_REQUESTS().then(function(data:any){
 		data.forEach((r:any) => {
-			console.log("rid:",r.id);
 			handleRequest(r);
 		})
 	})
@@ -23,7 +22,11 @@ export const ReadRequests=function(){
 
 interface iError{
 	type:string,
-	value:string
+	id?:number,
+	from?:string,
+	data:any,
+	value:string,
+	user?:any,
 }
 
 const handleRequest= async function(r:any){
@@ -45,7 +48,9 @@ const handleRequest= async function(r:any){
 	var times:any={"notific":null,"process":null}
 
 	let userEmails:string [] | null=null;
+	let userMailAddr:string="";
 	let suppEmail="supporto@roma1.infn.it"
+	let user:any=null;
 		
 	try{
 
@@ -55,17 +60,20 @@ const handleRequest= async function(r:any){
 		}
 		
 		//recupera utente da LDAP
-		var user=await getUser(uid);
+		user=await getUser(uid);
 		
 		//tutte le mail dell'utente
 		userEmails=[user.email,...user.mailAlternates]
-		
-		//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
-		//campo mail
-		let userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0]
 
+		if(!userEmails[0]) throw new Error("User email address not found.")
+
+			//selezione se presente indirizzo nome.cognome@roma1 oppure il suo indirizzo principale
+		//campo mail
+		userMailAddr=userEmails.filter(e=>e.match(/^(\w+(\.\w+)+@roma1.infn.it)$/))[0] || "";
+		
 		userMailAddr=userMailAddr || user.email;
 
+		if(!userMailAddr){ throw new Error("User mail address is empty") }
 		
 		//fare controllo utente se autorizzato
 		//TO DO CHECK USER AUTH ?
@@ -78,33 +86,34 @@ const handleRequest= async function(r:any){
 
 		
 		// inizializza il processatore della richiesta
-		let processor:any|null=null;
+		let processor:any=null;
 		
 		//******** Processamento automatico della richiesta **********//
 		try
 		{
 			//inizializza il processatore di richiesta
 			processor=ProcessRequest.initialize(rtype,user,data);
-
-			console.log(`Processing Request ID: ${id} - ${rtype}`)
-			
+					
 			//gestione automatica della richiesta (se implementato)
 			//ritorna oggetto di tipo report (wifi,account o IP)
-			report=await processor.exec();
-
-			console.log(`Processed Request ID: ${id} - ${rtype}`)
-
-			
-			if(report?.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+			if(processor)
 			{
-				console.log("Eccezione processamento")
-				throw new Error(report.processResult.getValue());
+				report=await processor.exec();
+
+				console.log(`Processed Request ID: ${id} - ${rtype}`)
+
+				
+				if(report?.processResult && report.processResult.getStatus()==ProcessResultStatus.BAD)
+				{
+					console.log("Eccezione processamento")
+					throw new Error(report.processResult.getValue());
+				}
 			}
 
 		}
 		catch(exc:any)
 		{
-			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc))})
+			errors.push({"type":"process","value":(exc.message || JSON.stringify(exc)),"data":data})
 		}
 
 		//se l'oggetto report non è stato creato (il process.exec ha generato errore)
@@ -120,6 +129,8 @@ const handleRequest= async function(r:any){
 
 		//advanced report => admin
 		var advrepo = await report.renderAs(RenderType.ADVANCED);
+
+		
 
 		//default mail subject
 		var mailSubj=`Richiesta ID ${id} - ${rtype}`;
@@ -148,34 +159,34 @@ const handleRequest= async function(r:any){
 	}
 	catch(exc:any)
     {
-		errors.push({"type":"request","value":(exc.message || JSON.stringify(exc))})
+		console.log(exc);
+		let from = !userMailAddr ? "dispatcher" : userMailAddr
+		let _user={"uid":user.uid,"uuid":user.uuid,"name":user.name,"surname":user.surname}
+		errors.push({"type":"request","id":r.id,"from":from,"data":data,"value":(exc.message || JSON.stringify(exc)),"user":_user})
     }
     finally
     {
 
 		times.process=moment()
-		let err=errors.length>0 ? JSON.stringify(errors) : null;
+		let err= errors.length>0 ? JSON.stringify(errors) : null;
 
-		errors.forEach(err=>
+		errors.forEach(async err=>
 		{
 			
 			let errTxt=JSON.stringify(err);
-			
-			/*
-			if(err.type=="request" && userEmails!=null)
-			{
-				helpers.sendReport(userEmails.join(";"),`Errore invio richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);	
-			}*/
-
-			//let to=user ? user.email : "alessandro.ruggieri@roma1.infn.it";//"supporto@®roma1.infn.it"
-			helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
+		
+			try{
+				await helpers.sendReport(suppEmail,suppEmail,`Errore elaborazione richiesta  ID - ${r.id} - Type - ${r.rtype}`,errTxt);
+			}
+			catch(exc){
+				console.log(exc);
+			}
 	
 		})
-		
-
+				
 		helpers.setDispatchResult(id,times.notific,times.process,err)
 
-		console.log("done request id: ",r.id)
+		console.log(`${err ? "error": "done"} request id: ${r.id}`)
     }
 }
 

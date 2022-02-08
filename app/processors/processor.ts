@@ -76,7 +76,8 @@ abstract class ProcessRequest{
                 return new Account_Processor(user,data);
             break;
             default:
-                throw Error(`No request handler for request type:${type}`);
+                //throw Error(`No request handler for request type:${type}`);
+                return null;
 
         }
     }

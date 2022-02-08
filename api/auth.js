@@ -7,7 +7,7 @@ async function forceLDAPSync(req,res,next)
     const env="prod"
     const url=`http://ds.roma1.infn.it/cgi-bin/fix_roles.cgi?infnUUID=${req.userid}&env=${env}`
  
-    console.log("Force SYNC");
+    console.log(`OnDemand SYNC userid: ${req.userid}`);
    
     let response=null;
 
@@ -22,8 +22,8 @@ async function forceLDAPSync(req,res,next)
 
     res.locals.syncResultMessage={"status":response.status,"message":response.data ? response.data.message :response}
 
-    //timeout 5000 quando il sync è andato bene --- diamo tempo al db Godiva di sistemarsi...
-    let timeout= response.status!=200 ? 1 : 5000;
+    //timeout 2000 quando il sync è andato bene --- diamo tempo al db Godiva di sistemarsi...
+    let timeout= response.status!=200 ? 1 : 2000;
 
     setTimeout(()=>{
       next();

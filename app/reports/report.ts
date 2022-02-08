@@ -1,8 +1,5 @@
 
 import {iProcessResult} from '../processors/processor'
-/*import {WiFiReport} from './wifi.repo'
-import {IPReport} from './ip.repo'
-import {AccountReport} from './acc.repo'*/
 import fs from 'fs';
 const path = require('path');
 const {templates} = require ('../api/templates')
@@ -65,10 +62,10 @@ abstract class Report
         {
             case RenderType.BASIC:
                 return this.mapBasicData(user,data);
-            break;
+           
             case RenderType.ADVANCED:
                 return this.mapAdvancedData(user,data);
-            break;
+            
         }
     }
 
