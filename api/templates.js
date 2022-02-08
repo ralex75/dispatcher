@@ -8,6 +8,11 @@ const generateHtmlWhiteSpace=(count)=>{
     return [...Array(count).keys()].map(i=>"&nbsp;").join("")
 }
 
+const generateHTMLSiteRoles=(siteRoles)=>{
+    //return Object.keys(siteRoles).filter(k=>k!='roma1').map(k=>`${k} - ${siteRoles[k]}`)
+    return Object.keys(siteRoles).map(k=>`${k.toUpperCase()} - ${siteRoles[k]}`)
+}
+
 function userInfo(user){
    
 
@@ -23,7 +28,7 @@ function userInfo(user){
         Email              : ${valueOrDefault(user.email)}
         Email alternativi  : ${valueOrDefault(userEmails).split(";").join(`\n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`)}
         Telefono           : ${valueOrDefault(user.phone)}
-        Ruolo              : ${valueOrDefault(user.role)}
+        Sede - Ruolo       : ${valueOrDefault(generateHTMLSiteRoles(user.siteRoles).join("\n "+generateHtmlWhiteSpace(21)))}
         Scadenza           : ${valueOrDefault(user.expiration)}
        
     `
