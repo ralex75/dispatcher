@@ -45,9 +45,8 @@ const getUsers=async function(keywords)
 
     let k=keywords
    
-    ldapFilter+=`(|(cn=*${k}*)(mail=${k})(schacPersonalUniqueID=*:CF:${k})(infnUUID=${k})(mailAlternateAddress=${k}))`
-    
-
+    ldapFilter+=`(|(cn=*${k}*)(uid=${k})(mail=${k})(schacPersonalUniqueID=*:CF:${k})(infnUUID=${k})(mailAlternateAddress=${k}))`
+        
     try{
 
             
@@ -100,6 +99,7 @@ var parseLDAPUserInfo=function (user) {
 
     let isMemberOf=user.isMemberOf;
     let role="";            //ruolo
+    let site="";            //sito 
     let isAdmin=false       //se appartiene al cc
     let defaultMinTime="01/01/1900"
     let minTime=defaultMinTime
@@ -123,7 +123,8 @@ var parseLDAPUserInfo=function (user) {
                     minTime=curTime;
                 }
                 else{
-                    if(curTime>minTime)
+                    if(Date.parse(curTime.split("-").reverse().join("-"))
+                        >Date.parse(minTime.split("-").reverse().join("-")))
                     {
                         minTime=curTime;
                     } 
@@ -144,11 +145,12 @@ var parseLDAPUserInfo=function (user) {
         let roles={"d":"dipendente","o":"ospite","a":"associato","v":"visitatore"}
 
         _isMemberOf.forEach(e=>{
-            let match=e.match(/i:infn:roma1::([d|o|a|v])/);
+            let match=e.match(/i:infn:(\w+)::([d|o|a|v])/);
             if(match) {
-                role = roles[match[1]] || null
+                site=match[1]
+                role = roles[match[2]] || null
             }
-            if(e.match(/i:infn:roma1:servizio_calcolo_e_reti::n:member/)){
+            if(e.match(/i:infn:roma1:servizio_calcolo_e_reti/)){
                 isAdmin=true;
             }
         })
@@ -159,16 +161,13 @@ var parseLDAPUserInfo=function (user) {
     //controllo se autorizzato
     const {loa2, itsec, policies, gracetime} = cuser;
     
-    let isAuthorized = role!=='' && loa2 && policies;
+    let isAuthorized = site=='roma1' && role!=='' && loa2 && policies && (itsec || gracetime);
 
-    if(isAuthorized && !itsec)
-    {
-        isAuthorized=gracetime;
-    }
     
 
     cuser["isAuthorized"]=isAuthorized
     cuser["role"]=role;
+    cuser["roma1"]=(site=='roma1');
     cuser["isAdmin"]=isAdmin;
 
     delete cuser["isMemberOf"]
