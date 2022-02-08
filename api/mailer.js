@@ -6,8 +6,7 @@ function sendMail(from,to,subj,body){
     to="alessandro.ruggieri@roma1.infn.it"
     
     let to_arr=to.split(";")
-    //console.log("Mailer is sending to:",to_arr)
-
+   
     let transporter = nodeMailer.createTransport({
         host: 'smtp.roma1.infn.it',
         port: 25
