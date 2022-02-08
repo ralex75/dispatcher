@@ -2,9 +2,6 @@ const nodeMailer = require('nodemailer');
 
 function sendMail(from,to,subj,body){
     
-    //solo per debug
-    to="alessandro.ruggieri@roma1.infn.it"
-    
     let to_arr=to.split(";")
    
     let transporter = nodeMailer.createTransport({
