@@ -9,6 +9,7 @@ const {authToken,forceLDAPSync} =require('./api/auth')
 const moment = require('moment')
 const logger=require('./api/logger')
 const restore=require('./api/restore')
+const userdb=require('./api/userdb')
 
 
 const cors=require('cors')
@@ -26,6 +27,7 @@ module.exports = app => {
   app.use('/mail',authToken,mail)
   app.use('/status',logger)
   app.use('/restore', authToken, restore)
+  app.use('/userdb',userdb)
   
   
   setInterval(()=>{
@@ -44,10 +46,6 @@ module.exports = app => {
      
      user = await getUser(req.userid);
 
-     //let resp=await requests.getFirst(user.uuid)
-
-     //user.firstReqDate= (resp[0] && resp[0].req_date) || moment();
-    
   }
   catch(exc)
   {

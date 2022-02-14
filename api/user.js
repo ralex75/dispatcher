@@ -18,7 +18,7 @@ const getUser=async function(uid)
 
             user=parseLDAPUserInfo(users_ldap[0])
 
-            console.log(user)
+            //console.log(user)
 
             delete user['isMemberOf']
             delete user["schacUserStatus"];
@@ -60,7 +60,7 @@ const getUsers=async function(keywords)
                 delete _user['isMemberOf']
                 delete _user["schacUserStatus"];
 
-                console.log(_user)
+                //console.log(_user)
                 users.push(_user)
             })
             
@@ -97,7 +97,7 @@ var parseLDAPUserInfo=function (user) {
     cuser.mailAlternates=ma.filter(e=>e.match(/\w+\.\w+@/)).sort()
                         .concat(ma.filter(e=>!e.match(/\w+\.\w+@/)).sort())
 
-    console.log("ma:",cuser.mailAlternates)                        
+    //console.log("ma:",cuser.mailAlternates)                        
 
     let isMemberOf=user.isMemberOf;
     let role="";            //ruolo

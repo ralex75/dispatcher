@@ -1,3 +1,4 @@
+const moment = require("moment")
 
 const valueOrDefault=(value)=>{
     return value || "---"
@@ -30,7 +31,6 @@ function userInfo(user){
         Telefono           : ${valueOrDefault(user.phone)}
         Sede - Ruolo       : ${valueOrDefault(generateHTMLSiteRoles(user.siteRoles).join("\n "+generateHtmlWhiteSpace(21)))}
         Scadenza           : ${valueOrDefault(user.expiration)}
-       
     `
     return txt.trim().split("\n").map(e=>e.trim()).join("\n");
 
@@ -52,9 +52,58 @@ function completeUserInfo(user){
     return txt.trim().split("\n").map(e=>e.trim()).join("\n");
 }
 
+const toDate=(date)=>{
+    if (!date) return ""
+    
+    return moment(date).format("DD-MM-YYYY")
+}
+
+
+function userDBInfo(user){
+   
+        
+    let txt=`
+        
+        Nome               : ${user.name} 
+        Cognome            : ${user.surname}
+        CF                 : ${valueOrDefault(user.cf)}
+        Email              : ${valueOrDefault(user.email)}
+        Telefono           : ${valueOrDefault(user.phone)}
+        Ruolo              : ${valueOrDefault(user.role)}
+        Stato              : ${user.stato}
+        Ente               : ${valueOrDefault(user.ente).toUpperCase()}
+    `
+
+    txt=txt.trim().split("\n").map(e=>e.trim()).join("\n")
+
+    if (user.role!='FISSO'){
+       
+        txt+=`
+        Tipo               : ${valueOrDefault(user.tipo)}
+        Gruppo             : ${valueOrDefault(user.gruppo).toUpperCase()}
+        Referente          : ${valueOrDefault(user.referente)}
+        Responsabile       : ${valueOrDefault(user.responsabile)}
+        Inizio visita      : ${valueOrDefault(toDate(user.inizio_visita))}
+        Fine   visita      : ${valueOrDefault(user.fine_visita).split("-").reverse().join("-")}
+        `
+    }
+    else{
+        txt+=`
+        Scadenza           : ${valueOrDefault(user.expire_date).split("-").reverse().join("-")}
+      
+        `
+    }
+    
+
+    return txt.trim().split("\n").map(e=>e.trim()).join("\n");
+
+}
+
+
 const templates={
     userInfo,
-    completeUserInfo
+    completeUserInfo,
+    userDBInfo
 }
 
 
