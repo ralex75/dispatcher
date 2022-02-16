@@ -25,7 +25,7 @@ function userInfo(user){
         Cognome            : ${user.surname}
         UID                : ${valueOrDefault(user.uid)}
         INFN UUID          : ${user.uuid}
-        CF                 : ${(user.cf!=user.uid) ? valueOrDefault(user.cf) : "---"}
+        CF                 : ${(user.cf!=user.uuid) ? valueOrDefault(user.cf) : "---"}
         Email              : ${valueOrDefault(user.email)}
         Email alternativi  : ${valueOrDefault(userEmails).split(";").join(`\n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`)}
         Telefono           : ${valueOrDefault(user.phone)}
