@@ -7,24 +7,28 @@ class IPReport extends Report{
         return "ip.txt";
     }
 
+    
+
     async mapBasicData(user:any,data:any):Promise<any>{
 
-        var {from,to,action} = data;
-        var h= to || from;
-        var hostname = h.name ? h.name+"."+h.domain : "DHCP : "+h.mac;
-        const HOST_ACTION_MAP:any={ "ITA":{"create":"Nuovo nodo","update":"Aggiornamento dati del nodo","delete":"Rimozione nodo"},
+        let {from,to,action} = data;
+        let h= to || from;
+        let hostname = this.toHostName(h.config,h.name,h.domain,h.mac);
+        const HOST_ACTION_MAP:any={ 
+                                    "ITA":{"create":"Nuovo nodo","update":"Aggiornamento dati del nodo","delete":"Rimozione nodo"},
                                     "ENG":{"create":"New host","update":"Update host data","delete":"Delete host"}
                                   };
 
         const HOST_CONFIG_MAP:any={"STATIC":"STATICO","DHCP":"DHCP","STATICVM":"STATICO - VIRTUALE"}
 
-      
-      
-        
 
         if(action=='update'){
-            hostname = from.name ? from.name+"."+from.domain : "DHCP  "+from.mac;
+            hostname = this.toHostName(from.config,from.name,from.domain,from.mac)
+            //hostname = from.config !='DHCP' ? `${from.name}.${from.domain}`: `DHCP ${from.mac}`
+            //hostname = from.name ? from.name+"."+from.domain : "DHCP  "+from.mac;
         }
+
+        
 
        
 
@@ -72,7 +76,7 @@ class IPReport extends Report{
                     "PHONE":user.phone || '---',
                     "H_MAC":h.mac.toUpperCase(),
                     "NOTE":h.notes || "---",
-                    "H_NAME": this.toHostName(h.name,h.domain),
+                    "H_NAME": this.toHostName(h.config,h.name,h.domain),
                     "CONFIG": HOST_CONFIG_MAP[h.config], 
                     "BUILD":loc.build,
                     "FLOOR":loc.floor,
@@ -85,7 +89,7 @@ class IPReport extends Report{
             loc=await helpers.getPortLocation(from.port);
 
             map["H_MAC"]=this.displayChanges(from.mac,map["H_MAC"]),
-            map["H_NAME"]=this.displayChanges(this.toHostName(from.name,from.domain),map["H_NAME"]),
+            map["H_NAME"]=this.displayChanges(this.toHostName(from.config,from.name,from.domain),map["H_NAME"]),
             map["CONFIG"]=this.displayChanges(HOST_CONFIG_MAP[from.config],map["CONFIG"]), 
             map["BUILD"]=this.displayChanges(loc.build,map["BUILD"]),
             map["FLOOR"]=this.displayChanges(loc.floor,map["FLOOR"]),
@@ -103,8 +107,8 @@ class IPReport extends Report{
   
     }
 
-    toHostName=(name:string,domain:string)=>{
-        return name ? `${name}.${domain}`: "DHCP"
+    toHostName=(config:string,name:string,domain:string,mac:string="")=>{
+        return config!='DHCP' ? `${name}.${domain}`: mac ? "DHCP "+mac : "DHCP"
     }
 
 
