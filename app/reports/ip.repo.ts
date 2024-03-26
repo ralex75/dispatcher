@@ -114,8 +114,8 @@ class IPReport extends Report{
 
     displayChanges(from:string,to:string):string
     {
-        from=from || ""
-        to= to || ""
+        from=from ?? ""
+        to= to ?? ""
         from=from.toString()
         to=to.toString();
 

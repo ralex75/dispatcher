@@ -84,7 +84,7 @@ var helpers={
 
     setDispatchResult:function(rid:any, notific:Moment|null, process:Moment|null, error:string|null){
         var status= !error ? "PROCESSED" : "BAD";
-        db.query("update user_requests set notific_date=$1,process_date=$2,exc=$3,status=$5 where id=$4",[notific,process,error,rid,status])
+        db.query("update user_requests set notific_date=$1,process_date=$2,logs=$3,status=$5 where id=$4",[notific,process,error,rid,status])
         .then( (resp:any) =>{
         }).catch( (err:any) => {
             console.log("An error has occurred:")
